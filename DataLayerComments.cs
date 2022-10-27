@@ -1,8 +1,10 @@
 ﻿
 
+using RedditNet.Models.CommentModel;
+
 namespace RedditNet
 {
-    public class DataLayer
+    public class DataLayerComments
     {
         public void createComment(CommentNode node, Comment c)
         {
@@ -21,6 +23,15 @@ namespace RedditNet
             {
                 DatabaseInterface.treeNodes[postId].Remove(id);
                 DatabaseInterface.comments[postId].Remove(id);
+            }
+        }
+
+        public void updateComment(String postId, int id, CommentUpdateModel c)
+        {
+            Comment updatedComment = readComment(postId, id);
+            if (updatedComment != null && updatedComment.isSame(c))
+            {
+                updatedComment.update(c);
             }
         }
 

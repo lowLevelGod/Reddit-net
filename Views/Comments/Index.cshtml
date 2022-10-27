@@ -8,8 +8,9 @@
     <p>Hello world!</p>
     foreach (var c in Model)
     {
-        <div style="margin-left : @c.Depth * 24p">
-        @c.Text
-        </div>
+        String ident = (c.Depth * 24).ToString() + "px";
+    <div style="margin-left : @ident">
+                @c.Text
+    </div>
     }
 }
