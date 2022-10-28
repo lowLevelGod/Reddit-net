@@ -1,11 +1,11 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace RedditNet
+namespace RedditNet.UtilityFolder
 {
     public class Hash
     {
-        public String sha256_hash(string value)
+        public string sha256_hash(string value)
         {
             StringBuilder Sb = new StringBuilder();
 

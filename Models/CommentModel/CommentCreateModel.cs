@@ -1,8 +1,7 @@
 ﻿namespace RedditNet.Models.CommentModel
 {
-    public class CommentCreateModel
+    public class CommentCreateModel : CommentModel
     {
-        public String UserId { get; set; }
         public String PostId { get; set; }
         public String Text { get; set; }
     }

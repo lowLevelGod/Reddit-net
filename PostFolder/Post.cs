@@ -1,41 +1,53 @@
-﻿using RedditNet.Models.CommentModel;
+﻿using RedditNet.CommentFolder;
+using RedditNet.Models.CommentModel;
 using RedditNet.Models.PostModel;
+using RedditNet.UtilityFolder;
 
-namespace RedditNet
+namespace RedditNet.PostFolder
 {
     public class Post : Submission
     {
-        private List<CommentThreadModel> comments;
         private CommentNode root;
-        private String id;
-        private String title;
+        private string id;
+        private string title;
 
+        public void setDeletedState()
+        {
+            base.setDeletedState();
+            Title = Constants.deleted;
+        }
         public Post() : base()
         {
 
         }
 
-        public bool isSame(PostUpdateModel p)
+        public bool isSame(PostModel p)
         {
             return UserId == p.UserId;
         }
 
         public void update(PostUpdateModel p)
         {
+            Text = p.Text == null ? Text : p.Text;
+            Votes = p.Votes == null ? Votes : p.Votes;
+        }
+
+        public Post(PostCreateModel p) : this(p.Title, p.UserId, p.Text)
+        {
 
         }
 
-        public Post(List<CommentThreadModel> l, String title, string userId, string text, String id = null, int? votes = 0) : base(userId, text, votes)
+        public Post(string title, string userId, string text, string id = null, int? votes = 0) : base(userId, text, votes)
         {
-            Comments = l;
+            Title = title;
             root = new CommentNode();
             if (id == null)
             {
                 Hash hash = new Hash();
 
-                TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+                TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
 
-                String toHash = "";
+                string toHash = "";
                 toHash += Convert.ToString((int)t.TotalSeconds);
                 toHash += title;
                 toHash += text;
@@ -43,9 +55,10 @@ namespace RedditNet
 
                 Id = hash.sha256_hash(toHash);
             }
+            else
+                Id = id;
         }
 
-        public List<CommentThreadModel> Comments { get => comments; set => comments = value; }
         public CommentNode Root { get => root; set => root = value; }
         public string Id { get => id; set => id = value; }
         public string Title { get => title; set => title = value; }

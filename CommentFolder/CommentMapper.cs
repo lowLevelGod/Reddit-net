@@ -1,6 +1,6 @@
 ﻿using RedditNet.Models.CommentModel;
 
-namespace RedditNet
+namespace RedditNet.CommentFolder
 {
     public class CommentMapper
     {
@@ -16,7 +16,7 @@ namespace RedditNet
             return result;
         }
 
-        public Comment createToComment(String postId, int id, CommentCreateModel c)
+        public Comment createToComment(string postId, int id, CommentCreateModel c)
         {
             Comment result = new Comment(postId, id, c.UserId, c.Text);
 

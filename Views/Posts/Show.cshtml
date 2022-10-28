@@ -1,0 +1,26 @@
+﻿@using RedditNet.Models
+@model RedditNet.Models.PostModel.PostThreadModel
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <h1>@Model.Title</h1>
+    <p>Post id: <b>@Model.Id </b></p>
+    <p>Votes: <b>@Model.Votes</b></p>
+    <p>User id: <b>@Model.UserId</b></p>
+    <p>Content: <b>@Model.Text</b></p>
+
+    <br />
+
+    <h1>Comment section below! </h1>
+
+    var comments = Model.Comments;
+    foreach (var c in comments)
+    {
+        String ident = (c.Depth * 24).ToString() + "px";
+        <div style="margin-left : @ident">
+            @c.Text
+        </div>
+    }
+}

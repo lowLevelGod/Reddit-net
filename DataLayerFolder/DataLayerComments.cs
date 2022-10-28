@@ -1,32 +1,34 @@
-﻿
-
+﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 
-namespace RedditNet
+namespace RedditNet.DataLayerFolder
 {
     public class DataLayerComments
     {
         public void createComment(CommentNode node, Comment c)
         {
-            if (!DatabaseInterface.treeNodes.ContainsKey(c.PostId))
+            if (DatabaseInterface.treeNodes.ContainsKey(c.PostId))
             {
-                DatabaseInterface.treeNodes[c.PostId] = new Dictionary<int, CommentNode>();
-                DatabaseInterface.comments[c.PostId] = new Dictionary<int, Comment>();
+                DatabaseInterface.treeNodes[c.PostId][c.Id] = node;
+                DatabaseInterface.comments[c.PostId][c.Id] = c;
             }
-            DatabaseInterface.treeNodes[c.PostId][c.Id] = node;
-            DatabaseInterface.comments[c.PostId][c.Id] = c;
         }
 
-        public void deleteComment(String postId, int id)
+        public void deleteComment(string postId, int id, CommentDeleteModel c)
         {
-            if (DatabaseInterface.treeNodes.ContainsKey(postId))
+            Comment deletedComment = readComment(postId, id);
+            if (deletedComment != null && deletedComment.isSame(c))
             {
-                DatabaseInterface.treeNodes[postId].Remove(id);
-                DatabaseInterface.comments[postId].Remove(id);
+                deletedComment.setDeletedState();
             }
+            //if (DatabaseInterface.treeNodes.ContainsKey(postId))
+            //{
+            //    DatabaseInterface.treeNodes[postId].Remove(id);
+            //    DatabaseInterface.comments[postId].Remove(id);
+            //}
         }
 
-        public void updateComment(String postId, int id, CommentUpdateModel c)
+        public void updateComment(string postId, int id, CommentUpdateModel c)
         {
             Comment updatedComment = readComment(postId, id);
             if (updatedComment != null && updatedComment.isSame(c))
@@ -35,7 +37,7 @@ namespace RedditNet
             }
         }
 
-        public CommentNode readNode(String postId, int id)
+        public CommentNode readNode(string postId, int id)
         {
             if (DatabaseInterface.treeNodes.ContainsKey(postId) && DatabaseInterface.treeNodes[postId].ContainsKey(id))
             {
@@ -45,7 +47,7 @@ namespace RedditNet
             return null;
         }
 
-        public Comment readComment(String postId, int id)
+        public Comment readComment(string postId, int id)
         {
             if (DatabaseInterface.comments.ContainsKey(postId) && DatabaseInterface.comments[postId].ContainsKey(id))
             {
@@ -55,12 +57,14 @@ namespace RedditNet
             return null;
         }
 
-        public List<CommentNode> getDescendants(String postId, int parentId)
+        public List<CommentNode> getDescendants(string postId, int parentId)
         {
+            Console.WriteLine(postId);
             List<CommentNode> nodes = new List<CommentNode>();
 
             Dictionary<int, CommentNode> tree = DatabaseInterface.treeNodes[postId];
-            String prefix = tree[parentId].Lineage;
+
+            string prefix = tree[parentId].Lineage;
 
             foreach (CommentNode node in tree.Values)
             {

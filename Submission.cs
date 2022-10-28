@@ -1,4 +1,6 @@
-﻿namespace RedditNet
+﻿using RedditNet.UtilityFolder;
+
+namespace RedditNet
 {
     public class Submission
     {
@@ -6,6 +8,11 @@
         private String text;
         private int? votes;
 
+        public void setDeletedState()
+        {
+            UserId = Constants.deleted;
+            Text = Constants.deleted;
+        }
         public Submission()
         {
 

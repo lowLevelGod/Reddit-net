@@ -1,14 +1,118 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RedditNet.CommentFolder;
+using RedditNet.DataLayerFolder;
+using RedditNet.Models.CommentModel;
+using RedditNet.Models.PostModel;
+using RedditNet.PostFolder;
 
 namespace RedditNet.Controllers
 {
     public class PostsController : Controller
     {
+        private static DataLayerComments d = DatabaseInterface.dataLayerComments;
+        private static DataLayerPosts dp = DatabaseInterface.dataLayerPosts;
+        private static int init = 0;
         //TODO
         //Implement CRUD for posts
         public IActionResult Index()
         {
             return View();
+        }
+
+        [NonAction]
+        private List<CommentThreadModel> getComments(String postId)
+        {
+            if (init == 0)
+            {
+                init = 1;
+
+                Post post = new Post("This is my first post!", "original poster", "Hello guys!", "postid");
+                dp.createPost(post);
+
+                Dictionary<String, Dictionary<int, CommentNode>> tree = DatabaseInterface.treeNodes;
+                Dictionary<String, Dictionary<int, Comment>> comments = DatabaseInterface.comments;
+
+                List<CommentNode> n = new List<CommentNode>();
+                List<Comment> nc = new List<Comment>();
+
+                n.Add(post.Root);
+                nc.Add(new Comment(post.Id, post.Root.Id));
+
+                for (int i = 1; i <= 7; ++i)
+                {
+                    DatabaseInterface.idGenerator++;
+                    CommentNode node = new CommentNode(DatabaseInterface.idGenerator);
+                    Comment comment = new Comment(post.Id, DatabaseInterface.idGenerator, "user " + DatabaseInterface.idGenerator.ToString(), "comment " + DatabaseInterface.idGenerator.ToString());
+                    n.Add(node);
+                    nc.Add(comment);
+                }
+
+
+                n[1].makeChildOf(n[0]);
+                n[2].makeChildOf(n[1]);
+                n[3].makeChildOf(n[2]);
+                n[4].makeChildOf(n[2]);
+                n[5].makeChildOf(n[1]);
+                n[6].makeChildOf(n[1]);
+                n[7].makeChildOf(n[6]);
+
+                for (int i = 0; i <= 7; ++i)
+                    d.createComment(n[i], nc[i]);
+            }
+
+            List<CommentNode> desc = d.getDescendants(postId, 0);
+
+            List<CommentThreadModel> result = new List<CommentThreadModel>();
+            CommentMapper mapper = new CommentMapper();
+
+            foreach (var x in desc)
+            {
+                CommentThreadModel t = mapper.toThreadModel(d.readComment(postId, x.Id), x.Depth);
+                result.Add(t);
+            }
+
+            return result;
+        }
+        [HttpGet("posts/{postId}/comments")]
+        public IActionResult Show(String postId)
+        {
+            List<CommentThreadModel> comments = getComments(postId);
+            Post post = dp.readPost(postId);
+            if (postId != null)
+            {
+                PostMapper mapper = new PostMapper();
+                PostThreadModel result = mapper.toThreadModel(comments, post);
+
+                return View(result);
+            }
+
+            return View("Error");
+        }
+
+        [HttpPut("posts/{postId}")]
+        public IActionResult Edit(String postId, [FromBody] PostUpdateModel p)
+        {
+            Console.WriteLine(p.Text);
+            dp.updatePost(postId, p);
+            return Ok();
+        }
+
+        [HttpPost("posts")]
+        public IActionResult Create([FromBody] PostCreateModel p)
+        {
+            PostMapper mapper = new PostMapper();
+            Post post = mapper.createModelToPost(p);
+
+            dp.createPost(post);
+            Console.WriteLine(post.Id);
+            return Ok();
+        }
+
+        [HttpDelete("posts/{postId}")]
+        public IActionResult Delete(String postId, [FromBody] PostDeleteModel p)
+        {
+            dp.deletePost(postId, p);
+            return Ok();
         }
     }
 }

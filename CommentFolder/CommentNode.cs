@@ -1,13 +1,15 @@
-﻿namespace RedditNet
+﻿using RedditNet.UtilityFolder;
+
+namespace RedditNet.CommentFolder
 {
     public class CommentNode
     {
         private int id;
         private int? parent;
         private int depth;
-        private String lineage;
+        private string lineage;
 
-        private String joinLineage(String l, int id)
+        private string joinLineage(string l, int id)
         {
             return l + Constants.lineageSeparator + id.ToString();
         }
