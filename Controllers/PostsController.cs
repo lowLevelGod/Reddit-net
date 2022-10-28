@@ -18,6 +18,7 @@ namespace RedditNet.Controllers
         //TODO
         //Use [deleted] for posts with deleted user
         //Add edit for admins
+        //Introduce tokens for authentication
         public IActionResult Index()
         {
             return View();

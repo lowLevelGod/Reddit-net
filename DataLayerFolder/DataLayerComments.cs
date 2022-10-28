@@ -1,6 +1,7 @@
 ﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.UserFolder;
+using System.Collections.Generic;
 
 namespace RedditNet.DataLayerFolder
 {
@@ -85,7 +86,60 @@ namespace RedditNet.DataLayerFolder
                     nodes.Add(node);
             }
 
+            Node root = BuildTreeAndGetRoots(nodes).First();
+
+            nodes = getDFS(root);
+
             return nodes;
+        }
+
+        private List<CommentNode> getDFS(Node root)
+        {
+            List<CommentNode> dfs = new List<CommentNode>();
+
+            Stack<Node> s = new Stack<Node>();
+
+            HashSet<Node> visited = new HashSet<Node>();
+
+            s.Push(root);
+
+            while (s.Count > 0)
+            {
+                Node current = s.Pop();
+
+                if (!visited.Contains(current))
+                    dfs.Add(current.commentNode);
+
+                visited.Add(current);
+                foreach (Node c in current.Children)
+                    if (!visited.Contains(c))
+                        s.Push(c);
+            }
+
+            return dfs;
+        }
+
+        class Node
+        {
+            public List<Node> Children = new List<Node>();
+            public Node Parent { get; set; }
+            public CommentNode commentNode { get; set; }
+        }
+
+        IEnumerable<Node> BuildTreeAndGetRoots(List<CommentNode> actualObjects)
+        {
+            Dictionary<int, Node> lookup = new Dictionary<int, Node>();
+            actualObjects.ForEach(x => lookup.Add(x.Id, new Node { commentNode = x }));
+            foreach (var item in lookup.Values)
+            {
+                Node proposedParent;
+                if (lookup.TryGetValue((int)item.commentNode.Parent, out proposedParent))
+                {
+                    item.Parent = proposedParent;
+                    proposedParent.Children.Add(item);
+                }
+            }
+            return lookup.Values.Where(x => x.Parent == null);
         }
     }
 }
