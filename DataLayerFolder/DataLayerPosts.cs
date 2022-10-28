@@ -2,11 +2,16 @@
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
+using RedditNet.UserFolder;
 
 namespace RedditNet.DataLayerFolder
 {
     public class DataLayerPosts
     {
+        private bool hasPermission(User affectedUser, User requestingUser)
+        {
+            return affectedUser.isSame(requestingUser) || requestingUser.isAdmin() || requestingUser.isMod();
+        }
         public void createPost(Post post)
         {
             DatabaseInterface.posts[post.Id] = post;
@@ -23,9 +28,15 @@ namespace RedditNet.DataLayerFolder
         public void deletePost(string id, PostDeleteModel p)
         {
             Post deletedPost = readPost(id);
-            if (deletedPost != null && deletedPost.isSame(p))
+            User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedPost.UserId);
+            User requestingUser = DatabaseInterface.dataLayerUsers.readUser(p.UserId);
+
+            if (affectedUser != null && requestingUser != null)
             {
-                deletedPost.setDeletedState();
+                if (deletedPost != null && hasPermission(affectedUser, requestingUser))
+                {
+                    deletedPost.setDeletedState();
+                }
             }
             //if (DatabaseInterface.posts.ContainsKey(id))
             //{

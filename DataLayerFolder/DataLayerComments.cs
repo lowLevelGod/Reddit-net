@@ -1,25 +1,39 @@
 ﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
+using RedditNet.UserFolder;
 
 namespace RedditNet.DataLayerFolder
 {
     public class DataLayerComments
     {
+        private bool hasPermission(User affectedUser, User requestingUser)
+        {
+            return affectedUser.isSame(requestingUser) || requestingUser.isAdmin() || requestingUser.isMod();
+        }
         public void createComment(CommentNode node, Comment c)
         {
             if (DatabaseInterface.treeNodes.ContainsKey(c.PostId))
             {
-                DatabaseInterface.treeNodes[c.PostId][c.Id] = node;
-                DatabaseInterface.comments[c.PostId][c.Id] = c;
+                if (!DatabaseInterface.treeNodes[c.PostId].ContainsKey(c.Id))
+                {
+                    DatabaseInterface.treeNodes[c.PostId][c.Id] = node;
+                    DatabaseInterface.comments[c.PostId][c.Id] = c;
+                }
             }
         }
 
         public void deleteComment(string postId, int id, CommentDeleteModel c)
         {
             Comment deletedComment = readComment(postId, id);
-            if (deletedComment != null && deletedComment.isSame(c))
+            User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedComment.UserId);
+            User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+
+            if (affectedUser != null && requestingUser != null)
             {
-                deletedComment.setDeletedState();
+                if (deletedComment != null && hasPermission(affectedUser, requestingUser))
+                {
+                    deletedComment.setDeletedState();
+                }
             }
             //if (DatabaseInterface.treeNodes.ContainsKey(postId))
             //{
@@ -59,7 +73,6 @@ namespace RedditNet.DataLayerFolder
 
         public List<CommentNode> getDescendants(string postId, int parentId)
         {
-            Console.WriteLine(postId);
             List<CommentNode> nodes = new List<CommentNode>();
 
             Dictionary<int, CommentNode> tree = DatabaseInterface.treeNodes[postId];

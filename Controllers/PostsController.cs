@@ -4,6 +4,8 @@ using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
+using RedditNet.UserFolder;
+using RedditNet.UtilityFolder;
 
 namespace RedditNet.Controllers
 {
@@ -11,9 +13,11 @@ namespace RedditNet.Controllers
     {
         private static DataLayerComments d = DatabaseInterface.dataLayerComments;
         private static DataLayerPosts dp = DatabaseInterface.dataLayerPosts;
+        private static DataLayerUsers du = DatabaseInterface.dataLayerUsers;
         private static int init = 0;
         //TODO
-        //Implement CRUD for posts
+        //Use [deleted] for posts with deleted user
+        //Add edit for admins
         public IActionResult Index()
         {
             return View();
@@ -25,6 +29,14 @@ namespace RedditNet.Controllers
             if (init == 0)
             {
                 init = 1;
+
+                User admin = new User("admin user", "1234", Constants.admin, "admin");
+                User mod = new User("mod user", "5678", Constants.mod, "mod");
+                User regular = new User("regular user", "8910", Constants.regular, "regular");
+
+                du.createUser(admin);
+                du.createUser(mod);
+                du.createUser(regular);
 
                 Post post = new Post("This is my first post!", "original poster", "Hello guys!", "postid");
                 dp.createPost(post);
@@ -92,7 +104,6 @@ namespace RedditNet.Controllers
         [HttpPut("posts/{postId}")]
         public IActionResult Edit(String postId, [FromBody] PostUpdateModel p)
         {
-            Console.WriteLine(p.Text);
             dp.updatePost(postId, p);
             return Ok();
         }

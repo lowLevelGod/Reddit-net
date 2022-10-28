@@ -1,16 +1,5 @@
 
 
-using RedditNet;
-
-//foreach (var x in desc)
-//{
-//    String pre = "";
-//    for (int i = 0; i < x.Depth; ++i)
-//        pre += "   ";
-//    pre += comments[postId][x.Id].Text;
-//    Console.WriteLine(pre);
-//}
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
