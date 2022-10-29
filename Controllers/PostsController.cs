@@ -25,7 +25,7 @@ namespace RedditNet.Controllers
         }
 
         [NonAction]
-        private List<CommentThreadModel> getComments(String postId)
+        private List<CommentThreadModel> getComments(String postId, int cmpMethod)
         {
             if (init == 0)
             {
@@ -73,15 +73,18 @@ namespace RedditNet.Controllers
                     d.createComment(n[i], nc[i]);
             }
 
-            List<CommentNode> desc = d.getDescendants(postId, 0);
+            List<CommentNode> desc = d.getDescendants(postId, 0, cmpMethod);
 
             List<CommentThreadModel> result = new List<CommentThreadModel>();
             CommentMapper mapper = new CommentMapper();
 
             foreach (var x in desc)
             {
-                CommentThreadModel t = mapper.toThreadModel(d.readComment(postId, x.Id), x.Depth);
-                result.Add(t);
+                if (x.Parent != Constants.noParent)
+                {
+                    CommentThreadModel t = mapper.toThreadModel(d.readComment(postId, x.Id), x.Depth);
+                    result.Add(t);
+                }
             }
 
             return result;
@@ -89,7 +92,7 @@ namespace RedditNet.Controllers
         [HttpGet("posts/{postId}/comments")]
         public IActionResult Show(String postId)
         {
-            List<CommentThreadModel> comments = getComments(postId);
+            List<CommentThreadModel> comments = getComments(postId, Constants.comparisonByTimeDesc);
             Post post = dp.readPost(postId);
             if (postId != null)
             {

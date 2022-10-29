@@ -1,6 +1,9 @@
-﻿using RedditNet.CommentFolder;
+﻿
+using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.UserFolder;
+using RedditNet.UtilityFolder;
+using System;
 using System.Collections.Generic;
 
 namespace RedditNet.DataLayerFolder
@@ -72,7 +75,7 @@ namespace RedditNet.DataLayerFolder
             return null;
         }
 
-        public List<CommentNode> getDescendants(string postId, int parentId)
+        public List<CommentNode> getDescendants(string postId, int parentId, int cmpMethod = Constants.comparisonByTimeDesc)
         {
             List<CommentNode> nodes = new List<CommentNode>();
 
@@ -82,11 +85,11 @@ namespace RedditNet.DataLayerFolder
 
             foreach (CommentNode node in tree.Values)
             {
-                if (node.Parent != null && node.Lineage.StartsWith(prefix))
+                if (node.Lineage.StartsWith(prefix))
                     nodes.Add(node);
             }
 
-            Node root = BuildTreeAndGetRoots(nodes).First();
+            Node root = BuildTreeAndGetRoots(nodes, cmpMethod).First();
 
             nodes = getDFS(root);
 
@@ -119,14 +122,18 @@ namespace RedditNet.DataLayerFolder
             return dfs;
         }
 
-        class Node
+        class Node : IComparable<Node>
         {
+            public int CompareTo(Node other)
+            {
+                return this.commentNode.CompareTo(other.commentNode);
+            }
             public List<Node> Children = new List<Node>();
             public Node Parent { get; set; }
             public CommentNode commentNode { get; set; }
         }
 
-        IEnumerable<Node> BuildTreeAndGetRoots(List<CommentNode> actualObjects)
+        IEnumerable<Node> BuildTreeAndGetRoots(List<CommentNode> actualObjects, int cmpMethod)
         {
             Dictionary<int, Node> lookup = new Dictionary<int, Node>();
             actualObjects.ForEach(x => lookup.Add(x.Id, new Node { commentNode = x }));
@@ -139,7 +146,39 @@ namespace RedditNet.DataLayerFolder
                     proposedParent.Children.Add(item);
                 }
             }
+
+            foreach (var x in lookup.Values)
+            {
+                if (x.Parent == null)
+                {
+                    switch (cmpMethod)
+                    {
+                        case Constants.comparisonByTimeAsc:
+                            x.Children.Sort(byTimeAsc);
+                            break;
+                        case Constants.comparisonByTimeDesc:
+                            x.Children.Sort(byTimeDesc);
+                            break;
+                        default:
+                            x.Children.Sort(byTimeDesc);
+                            break;
+                    }
+                }else
+                    x.Children.Sort(byTimeDesc);
+            }
+
             return lookup.Values.Where(x => x.Parent == null);
         }
+
+        static Comparison<Node> byTimeDesc = delegate (Node object1, Node object2)
+        {
+            return object1.commentNode.CompareTo(object2.commentNode);
+        };
+
+        static Comparison<Node> byTimeAsc = delegate (Node object1, Node object2)
+        {
+            return -object1.commentNode.CompareTo(object2.commentNode);
+        };
+
     }
 }
