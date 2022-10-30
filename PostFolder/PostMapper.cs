@@ -15,6 +15,20 @@ namespace RedditNet.PostFolder
             result.RootId = post.Root.Id;
             result.Votes = post.Votes;
             result.Id = post.Id;
+            result.SubId = post.SubId;
+
+            return result;
+        }
+
+        public PostPreviewModel toPreviewModel(String userName, Post p)
+        {
+            PostPreviewModel result = new PostPreviewModel();
+            result.UserId = p.UserId;
+            result.SubId = p.SubId;
+            result.Id = p.Id;
+            result.Title = p.Title;
+            result.Votes = p.Votes;
+            result.UserName = userName;
 
             return result;
         }

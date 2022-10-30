@@ -10,6 +10,7 @@ namespace RedditNet.PostFolder
         private CommentNode root;
         private string id;
         private string title;
+        private String subId;
 
         public void setDeletedState()
         {
@@ -29,17 +30,18 @@ namespace RedditNet.PostFolder
         public void update(PostUpdateModel p)
         {
             Text = p.Text == null ? Text : p.Text;
-            Votes = p.Votes == null ? Votes : p.Votes;
+            Votes = p.Votes == null ? Votes : (int)p.Votes;
         }
 
-        public Post(PostCreateModel p) : this(p.Title, p.UserId, p.Text)
+        public Post(PostCreateModel p) : this(p.Title, p.UserId, p.Text, p.SubId)
         {
 
         }
 
-        public Post(string title, string userId, string text, string id = null, int? votes = 0) : base(userId, text, votes)
+        public Post(string title, string userId, string text, string subId, string id = null, int votes = 0) : base(userId, text, votes)
         {
             Title = title;
+            SubId = subId;
             root = new CommentNode();
             if (id == null)
             {
@@ -62,5 +64,6 @@ namespace RedditNet.PostFolder
         public CommentNode Root { get => root; set => root = value; }
         public string Id { get => id; set => id = value; }
         public string Title { get => title; set => title = value; }
+        public string SubId { get => subId; set => subId = value; }
     }
 }

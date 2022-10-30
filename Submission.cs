@@ -6,11 +6,11 @@ namespace RedditNet
     {
         private String userId;
         private String text;
-        private int? votes;
+        private int votes;
 
         public void setDeletedState()
         {
-            UserId = Constants.deleted;
+            //UserId = Constants.deleted;
             Text = Constants.deleted;
         }
         public Submission()
@@ -18,7 +18,7 @@ namespace RedditNet
 
         }
 
-        public Submission(string userId, string text, int? votes = 0)
+        public Submission(string userId, string text, int votes = 0)
         {
             UserId = userId;
             Text = text;
@@ -33,6 +33,6 @@ namespace RedditNet
 
         public string UserId { get => userId; set => userId = value; }
         public string Text { get => text; set => text = value; }
-        public int? Votes { get => votes; set => votes = value; }
+        public int Votes { get => votes; set => votes = value; }
     }
 }

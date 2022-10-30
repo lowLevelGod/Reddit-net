@@ -32,7 +32,7 @@ namespace RedditNet.CommentFolder
         public void update(CommentUpdateModel c)
         {
             Text = c.Text == null ? Text : c.Text;
-            Votes = c.Votes == null ? Votes : c.Votes;
+            Votes = c.Votes == null ? Votes : (int)c.Votes;
         }
 
         public string PostId { get => postId; set => postId = value; }

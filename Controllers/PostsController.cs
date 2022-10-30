@@ -4,6 +4,7 @@ using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
+using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
 
@@ -14,6 +15,7 @@ namespace RedditNet.Controllers
         private static DataLayerComments d = DatabaseInterface.dataLayerComments;
         private static DataLayerPosts dp = DatabaseInterface.dataLayerPosts;
         private static DataLayerUsers du = DatabaseInterface.dataLayerUsers;
+        private static DataLayerSubReddits ds = DatabaseInterface.dataLayerSubReddits;
         private static int init = 0;
         //TODO
         //Use [deleted] for posts with deleted user
@@ -25,7 +27,7 @@ namespace RedditNet.Controllers
         }
 
         [NonAction]
-        private List<CommentThreadModel> getComments(String postId, int cmpMethod)
+        private List<CommentThreadModel> getComments(String subId, String postId, int cmpMethod)
         {
             if (init == 0)
             {
@@ -35,12 +37,17 @@ namespace RedditNet.Controllers
                 User mod = new User("mod user", "5678", Constants.mod, "mod");
                 User regular = new User("regular user", "8910", Constants.regular, "regular");
 
+
                 du.createUser(admin);
                 du.createUser(mod);
                 du.createUser(regular);
 
-                Post post = new Post("This is my first post!", "original poster", "Hello guys!", "postid");
+                SubReddit sub = new SubReddit("r/Romania", "Welcome to r/Romania!", "subid");
+                ds.createSubReddit(sub, admin.Id);
+
+                Post post = new Post("This is my first post!", "regular", "Hello guys!", "subid", "postid");
                 dp.createPost(post);
+
 
                 Dictionary<String, Dictionary<int, CommentNode>> tree = DatabaseInterface.treeNodes;
                 Dictionary<String, Dictionary<int, Comment>> comments = DatabaseInterface.comments;
@@ -89,11 +96,11 @@ namespace RedditNet.Controllers
 
             return result;
         }
-        [HttpGet("posts/{postId}/comments")]
-        public IActionResult Show(String postId)
+        [HttpGet("{subId}/posts/{postId}/comments")]
+        public IActionResult Show(String subId, String postId)
         {
-            List<CommentThreadModel> comments = getComments(postId, Constants.comparisonByTimeDesc);
-            Post post = dp.readPost(postId);
+            List<CommentThreadModel> comments = getComments(subId, postId, Constants.comparisonByTimeDesc);
+            Post post = dp.readPost(subId, postId);
             if (postId != null)
             {
                 PostMapper mapper = new PostMapper();
@@ -105,10 +112,10 @@ namespace RedditNet.Controllers
             return View("Error");
         }
 
-        [HttpPut("posts/{postId}")]
-        public IActionResult Edit(String postId, [FromBody] PostUpdateModel p)
+        [HttpPut("{subId}/posts/{postId}")]
+        public IActionResult Edit(String subId, String postId, [FromBody] PostUpdateModel p)
         {
-            dp.updatePost(postId, p);
+            dp.updatePost(subId, postId, p);
             return Ok();
         }
 
@@ -123,10 +130,10 @@ namespace RedditNet.Controllers
             return Ok();
         }
 
-        [HttpDelete("posts/{postId}")]
-        public IActionResult Delete(String postId, [FromBody] PostDeleteModel p)
+        [HttpDelete("{subId}/posts/{postId}")]
+        public IActionResult Delete(String subId, String postId, [FromBody] PostDeleteModel p)
         {
-            dp.deletePost(postId, p);
+            dp.deletePost(subId, postId, p);
             return Ok();
         }
     }

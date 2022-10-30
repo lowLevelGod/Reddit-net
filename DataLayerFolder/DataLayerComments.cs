@@ -12,7 +12,7 @@ namespace RedditNet.DataLayerFolder
     {
         private bool hasPermission(User affectedUser, User requestingUser)
         {
-            return affectedUser.isSame(requestingUser) || requestingUser.isAdmin() || requestingUser.isMod();
+            return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
         }
         public void createComment(CommentNode node, Comment c)
         {
@@ -32,7 +32,7 @@ namespace RedditNet.DataLayerFolder
             User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedComment.UserId);
             User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
 
-            if (affectedUser != null && requestingUser != null)
+            if (requestingUser != null)
             {
                 if (deletedComment != null && hasPermission(affectedUser, requestingUser))
                 {
@@ -48,10 +48,17 @@ namespace RedditNet.DataLayerFolder
 
         public void updateComment(string postId, int id, CommentUpdateModel c)
         {
+
             Comment updatedComment = readComment(postId, id);
-            if (updatedComment != null && updatedComment.isSame(c))
+            User affectedUser = DatabaseInterface.dataLayerUsers.readUser(updatedComment.UserId);
+            User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+
+            if (requestingUser != null)
             {
-                updatedComment.update(c);
+                if (updatedComment != null && hasPermission(affectedUser, requestingUser))
+                {
+                    updatedComment.update(c);
+                }
             }
         }
 

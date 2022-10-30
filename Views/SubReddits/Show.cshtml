@@ -1,0 +1,20 @@
+﻿@using RedditNet.Models
+@model RedditNet.Models.SubRedditModel.SubRedditPostsModel
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var posts = Model.Posts;
+    <h1>@Model.Name</h1>
+    <p>Description: <b>@Model.Description</b></p>
+    
+    <h2>Posts below</h2>
+
+    foreach (var p in posts)
+    {
+        <h1>Title: @p.Title</h1>
+        <p>Posted by: @p.UserName</p>
+        <p>Votes: @p.Votes</p>
+    }
+}
