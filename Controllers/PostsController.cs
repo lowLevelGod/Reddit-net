@@ -33,9 +33,9 @@ namespace RedditNet.Controllers
             {
                 init = 1;
 
-                User admin = new User("admin user", "1234", Constants.admin, "admin");
-                User mod = new User("mod user", "5678", Constants.mod, "mod");
-                User regular = new User("regular user", "8910", Constants.regular, "regular");
+                User admin = new User("admin user", "1234", "admin@bmail.com", "I'm an admin!", Constants.admin, "admin");
+                User mod = new User("mod user", "5678", "mod@bmail.com", "I'm a mod!", Constants.mod, "mod");
+                User regular = new User("regular user", "8910", "regular@bmail.com", "I'm a regular!", Constants.regular, "regular");
 
 
                 du.createUser(admin);

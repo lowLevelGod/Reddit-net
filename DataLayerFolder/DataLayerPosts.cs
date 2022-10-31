@@ -60,9 +60,12 @@ namespace RedditNet.DataLayerFolder
 
             if (requestingUser != null)
             {
-                if (updatedPost != null && hasPermission(affectedUser, requestingUser))
+                if (updatedPost != null)
                 {
-                    updatedPost.update(p);
+                    if (hasPermission(affectedUser, requestingUser))
+                        updatedPost.update(p);
+                    if (p.SubId != null)
+                        changeSubReddit(updatedPost.SubId, p.SubId, updatedPost.Id, requestingUser.Id);
                 }
             }
         }

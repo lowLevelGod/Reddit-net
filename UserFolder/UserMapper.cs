@@ -26,13 +26,15 @@ namespace RedditNet.UserFolder
             result.Id = u.Id;
             result.UserName = u.UserName;
             result.Role = roleToString(u.Role);
+            result.Email = u.Email;
+            result.Description = u.Description;
 
             return result;
         }
 
         public User createModelToUser(UserCreateModel u)
         {
-            User result = new User(u.UserName, u.Password, Constants.regular);
+            User result = new User(u.UserName, u.Password, u.Email, u.Description, Constants.regular);
 
             return result;
         }
