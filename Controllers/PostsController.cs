@@ -2,20 +2,25 @@
 using RedditNet.CommentFolder;
 using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
+using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
+using System.Runtime.InteropServices;
 
 namespace RedditNet.Controllers
 {
     public class PostsController : Controller
     {
-        private static DataLayerPosts dp = DatabaseInterface.dataLayerPosts;
-        private static DataLayerUsers du = DatabaseInterface.dataLayerUsers;
-        private static DataLayerSubReddits ds = DatabaseInterface.dataLayerSubReddits;
-        private static int init = 0;
+        private DataLayerPosts dbPosts;
+        private DataLayerComments dbComments;
+        public PostsController(AppDbContext context)
+        {
+            dbPosts = new DataLayerPosts(context);
+            dbComments = new DataLayerComments(context);
+        }
         //TODO
         //Use [deleted] for posts with deleted user
         //Add edit for admins
@@ -95,21 +100,38 @@ namespace RedditNet.Controllers
 
             return null;
         }
-        //[HttpGet("{subId}/posts/{postId}/comments")]
-        //public IActionResult Show(String subId, String postId)
-        //{
-        //    List<CommentThreadModel> comments = getComments(subId, postId, Constants.comparisonByTimeDesc);
-        //    Post post = dp.readPost(subId, postId);
-        //    if (postId != null)
-        //    {
-        //        PostMapper mapper = new PostMapper();
-        //        PostThreadModel result = mapper.toThreadModel(comments, post);
 
-        //        return View(result);
-        //    }
+        [HttpGet("{subId}/posts/{postId}/comments")]
+        public IActionResult Show(String subId, String postId)
+        {
+            List<CommentNode>? nodes = dbComments.getDescendants(postId);
+            if (nodes == null)
+                return View("Error");
 
-        //    return View("Error");
-        //}
+            List<CommentThreadModel> comments = new List<CommentThreadModel>();
+            foreach (CommentNode n in nodes)
+            {
+                DatabaseMapper mapper = new DatabaseMapper();
+                DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
+                if (dbc != null)
+                {
+                    comments.Add(mapper.toThreadComment(dbc));
+                }
+            }
+
+            DatabasePost? dbPost = dbPosts.readPost(subId, postId);
+
+            if (dbPost != null)
+            {
+                PostMapper pmapper = new PostMapper();
+                DatabaseMapper databaseMapper = new DatabaseMapper();
+                PostThreadModel result = pmapper.toThreadModel(comments, databaseMapper.toPost(dbPost));
+
+                return View("Show", result);
+            }
+
+            return View("Error");
+        }
 
         //[HttpPut("{subId}/posts/{postId}")]
         //public IActionResult Edit(String subId, String postId, [FromBody] PostUpdateModel p)
@@ -118,16 +140,33 @@ namespace RedditNet.Controllers
         //    return Ok();
         //}
 
-        //[HttpPost("posts")]
-        //public IActionResult Create([FromBody] PostCreateModel p)
-        //{
-        //    PostMapper mapper = new PostMapper();
-        //    Post post = mapper.createModelToPost(p);
+        [HttpPost("{subId}/posts/create")]
+        public IActionResult Create(PostCreateModel p)
+        {
+            PostMapper mapper = new PostMapper();
+            Post post = mapper.createModelToPost(p);
 
-        //    dp.createPost(post);
-        //    Console.WriteLine(post.Id);
-        //    return Ok();
-        //}
+            Console.WriteLine(post.Text);
+
+            DatabasePost? dbPost = dbPosts.createPost(post);
+            if (dbPost != null)
+            {
+                return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
+            }
+            return BadRequest();
+        }
+
+        [HttpGet("{subId}/posts/create")]
+        public IActionResult CreateForm(String subId)
+        {
+            PostCreateModel cm = new PostCreateModel();
+            cm.Title = "";
+            cm.Text = "";
+            cm.UserId = "";
+            cm.SubId = subId;
+
+            return View("Create", cm);
+        }
 
         //[HttpDelete("{subId}/posts/{postId}")]
         //public IActionResult Delete(String subId, String postId, [FromBody] PostDeleteModel p)

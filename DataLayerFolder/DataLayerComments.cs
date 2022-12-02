@@ -53,41 +53,50 @@ namespace RedditNet.DataLayerFolder
             }
         }
 
-        //public void deleteComment(string postId, int id, CommentDeleteModel c)
-        //{
-        //    Comment deletedComment = readComment(postId, id);
-        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedComment.UserId);
-        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+        public bool deleteComment(string postId, int id, CommentDeleteModel c)
+        {
+            DatabaseComment? dbc = readComment(postId, id);
+            if (dbc != null)
+            {
+                try
+                {
+                    db.Remove<DatabaseComment>(dbc);
+                    db.SaveChanges();
 
-        //    if (requestingUser != null)
-        //    {
-        //        if (deletedComment != null && hasPermission(affectedUser, requestingUser))
-        //        {
-        //            deletedComment.setDeletedState();
-        //        }
-        //    }
-        //    //if (DatabaseInterface.treeNodes.ContainsKey(postId))
-        //    //{
-        //    //    DatabaseInterface.treeNodes[postId].Remove(id);
-        //    //    DatabaseInterface.comments[postId].Remove(id);
-        //    //}
-        //}
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
 
-        //public void updateComment(string postId, int id, CommentUpdateModel c)
-        //{
+            }
 
-        //    Comment updatedComment = readComment(postId, id);
-        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(updatedComment.UserId);
-        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+            return false;
+        }
 
-        //    if (requestingUser != null)
-        //    {
-        //        if (updatedComment != null && hasPermission(affectedUser, requestingUser))
-        //        {
-        //            updatedComment.update(c);
-        //        }
-        //    }
-        //}
+        public DatabaseComment? updateComment(string postId, int id, CommentUpdateModel c)
+        {
+            DatabaseComment? dbc = readComment(postId, id);
+            if (dbc != null)
+            { 
+                try
+                {
+                    dbc.Text = c.Text;
+                    dbc.Votes = c.Votes;
+                    db.SaveChanges();
+
+                    return dbc;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
+            }
+
+            return null;
+        }
 
         //public CommentNode readNode(string postId, int id)
         //{

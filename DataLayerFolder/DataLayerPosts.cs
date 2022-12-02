@@ -1,5 +1,6 @@
 ﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
+using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
@@ -9,25 +10,36 @@ namespace RedditNet.DataLayerFolder
 {
     public class DataLayerPosts
     {
+        private readonly AppDbContext db;
+        public DataLayerPosts(AppDbContext db)
+        {
+            this.db = db;
+        }
         //private bool hasPermission(User affectedUser, User requestingUser)
         //{
         //    return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
         //}
-        //public void createPost(Post post)
-        //{
-        //    if (DatabaseInterface.posts.ContainsKey(post.SubId))
-        //    {
-        //        DatabaseInterface.posts[post.SubId][post.Id] = post;
+        public DatabasePost? createPost(Post post)
+        {
+            DataLayerComments d = new DataLayerComments(db);
+            if (d.createComment(post.Root, new Comment(post.Id, post.Root.Id, post.UserId, "root comment")) != null)
+            {
+                DatabaseMapper mapper = new DatabaseMapper();
+                DatabasePost p = mapper.toDBPost(post);
 
-        //        DatabaseInterface.treeNodes[post.Id] = new Dictionary<int, CommentNode>();
-        //        DatabaseInterface.comments[post.Id] = new Dictionary<int, Comment>();
+                try
+                {
+                    db.Add<DatabasePost>(p);
+                    db.SaveChanges();
 
-        //        DataLayerComments d = DatabaseInterface.dataLayerComments;
-
-        //        d.createComment(post.Root, new Comment(post.Id, post.Root.Id));
-        //    }
-
-        //}
+                    return p;
+                }catch (Exception)
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
 
         //public void deletePost(string subId, string id, PostDeleteModel p)
         //{
@@ -70,15 +82,21 @@ namespace RedditNet.DataLayerFolder
         //    }
         //}
 
-        //public Post readPost(string subId, string id)
-        //{
-        //    if (DatabaseInterface.posts.ContainsKey(subId) && DatabaseInterface.posts[subId].ContainsKey(id))
-        //    {
-        //        return DatabaseInterface.posts[subId][id];
-        //    }
+        public DatabasePost? readPost(string subId, string id)
+        {
+            try
+            {
+                DatabasePost? p = (from b in db.Posts
+                                   where (b.Id == id) && (b.SubId == subId)
+                                   select b).FirstOrDefault<DatabasePost>();
 
-        //    return null;
-        //}
+                return p;
+            }catch (Exception)
+            {
+                return null;
+            }
+
+        }
 
         //public void removePost(string subId, string id)
         //{

@@ -30,22 +30,41 @@ namespace RedditNet.Controllers
             return View("Error");
         }
 
-        //[HttpPut("{postId}/comments/{commentId}")]
-        //public IActionResult Edit(String postId, int commentId, [FromBody] CommentUpdateModel c)
-        //{
-        //    // TODO 
-        //    // CHECK IF USER ALREADY VOTED
-        //    // POSSIBLE RACE CONDITION
-        //    d.updateComment(postId, commentId, c);
+        [HttpPost("{postId}/comments/edit/{commentId}")]
+        public IActionResult Edit(String postId, int commentId, CommentUpdateModel c)
+        {
+            DatabaseComment? result = dbComments.updateComment(postId, commentId, c);  
+            if (result != null)
+                return RedirectToAction("Show", new { postId = result.PostId, commentId = result.Id });
 
-        //    return Ok();
-        //}
+            return BadRequest();
+        }
+
+        [HttpGet("{postId}/comments/edit/{commentId}")]
+        public IActionResult EditForm(String postId, int commentId)
+        {
+            DatabaseComment? dbc = dbComments.readComment(postId, commentId);
+            if (dbc != null)
+            {
+                CommentUpdateModel cm = new CommentUpdateModel();
+                cm.PostId = dbc.PostId;
+                cm.UserId = dbc.UserId;
+                cm.Text = dbc.Text;
+                cm.Votes = dbc.Votes;
+                cm.Id = dbc.Id;
+
+                return View("Edit", cm);
+            }
+
+            return View("Error");
+        }
+
 
         [HttpGet("{postId}/comments/reply/{commentId}")]
 
         public IActionResult CreateForm(String postId, int commentId)
         {
-            CommentModel cm = new CommentModel();
+            CommentCreateModel cm = new CommentCreateModel();
             cm.PostId = postId;
             cm.Parent = commentId;
 
@@ -85,16 +104,35 @@ namespace RedditNet.Controllers
 
             if (dbComment != null)
                 return RedirectToAction("Show", new { postId = dbComment.PostId, commentId = dbComment.Id});
-            Console.WriteLine("Bad");
+
             return BadRequest();
         }
 
-        //[HttpDelete("{postId}/comments/{commentId}")]
-        //public IActionResult Delete(String postId, int commentId, [FromBody] CommentDeleteModel c)
-        //{
-        //    d.deleteComment(postId, commentId, c);
-        //    return Ok();
-        //}
+        [HttpPost("{postId}/comments/delete/{commentId}")]
+        public IActionResult Delete(String postId, int commentId, CommentDeleteModel c)
+        {
+            if (dbComments.deleteComment(postId, commentId, c) == true)
+                return RedirectToAction("ListComments", new { postId = c.PostId });
+
+            return BadRequest();
+        }
+
+        [HttpGet("{postId}/comments/delete/{commentId}")]
+        public IActionResult DeleteForm(String postId, int commentId)
+        {
+            DatabaseComment? dbc = dbComments.readComment(postId, commentId);
+            if (dbc != null)
+            {
+                CommentDeleteModel cm = new CommentDeleteModel();
+                cm.PostId = dbc.PostId;
+                cm.UserId = dbc.UserId;
+                cm.Id = dbc.Id;
+
+                return View("Delete", cm);
+            }
+
+            return View("Error");
+        }
 
     }
 }

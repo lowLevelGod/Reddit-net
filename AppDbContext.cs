@@ -12,5 +12,6 @@ namespace RedditNet
         }
 
         public DbSet<DatabaseComment> Comments { get; set; }
+        public DbSet<DatabasePost> Posts { get; set; }
     }
 }

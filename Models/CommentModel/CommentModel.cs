@@ -3,7 +3,9 @@
     public class CommentModel
     {
         public String UserId { get; set; }
-        public int Parent { get; set; }
+
+        public int Id { get; set; }
+
         public String PostId { get; set; }
     }
 }

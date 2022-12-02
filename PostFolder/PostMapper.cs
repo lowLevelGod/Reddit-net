@@ -12,7 +12,6 @@ namespace RedditNet.PostFolder
             result.Text = post.Text;
             result.Title = post.Title;
             result.UserId = post.UserId;
-            result.RootId = post.Root.Id;
             result.Votes = post.Votes;
             result.Id = post.Id;
             result.SubId = post.SubId;

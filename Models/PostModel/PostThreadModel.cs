@@ -10,8 +10,6 @@ namespace RedditNet.Models.PostModel
 
         public int? Votes { get; set; }   
 
-        public int? RootId { get; set; }
-
         public List<CommentThreadModel> Comments { get; set; }
     }
 }

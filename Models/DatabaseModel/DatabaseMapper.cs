@@ -1,5 +1,6 @@
 ﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
+using RedditNet.PostFolder;
 
 namespace RedditNet.Models.DatabaseModel
 {
@@ -27,5 +28,26 @@ namespace RedditNet.Models.DatabaseModel
 
             return mapper.toThreadModel(comment, c.Depth);
         }
+
+        public DatabasePost toDBPost(Post p)
+        {
+            DatabasePost res = new DatabasePost();
+            res.Text = p.Text;
+            res.Title = p.Title;
+            res.Votes = p.Votes;
+            res.Id = p.Id;
+            res.UserId = p.UserId;
+            res.SubId = p.SubId;
+
+            return res;
+        }
+
+        public Post toPost(DatabasePost p)
+        {
+            Post res = new Post(p.Title, p.UserId, p.Text, p.SubId, p.Id, p.Votes);
+
+            return res;
+        }
+
     }
 }
