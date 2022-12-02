@@ -16,7 +16,7 @@ namespace RedditNet.CommentFolder
             return result;
         }
 
-        public Comment createToComment(string postId, int id, CommentCreateModel c)
+        public Comment createToComment(string postId, CommentCreateModel c, int id = 0)
         {
             Comment result = new Comment(postId, id, c.UserId, c.Text);
 

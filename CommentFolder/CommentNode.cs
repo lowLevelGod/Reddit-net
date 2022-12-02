@@ -27,7 +27,7 @@ namespace RedditNet.CommentFolder
             Depth = parent.Depth + 1;
             Lineage = joinLineage(parent.Lineage, parent.Id);
         }
-        public CommentNode(int id = 0, int parent = Constants.noParent, int depth = 0, string lineage = "/")
+        public CommentNode(int parent = Constants.noParent, int depth = 0, string lineage = "/", int id = 0)
         {
             Id = id;
             Parent = parent;

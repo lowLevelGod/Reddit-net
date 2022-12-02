@@ -7,7 +7,6 @@ namespace RedditNet.Controllers
 {
     public class UsersController : Controller
     {
-        private static DataLayerComments d = DatabaseInterface.dataLayerComments;
         private static DataLayerPosts dp = DatabaseInterface.dataLayerPosts;
         private static DataLayerUsers du = DatabaseInterface.dataLayerUsers;
         public IActionResult Index()

@@ -1,99 +1,151 @@
 ﻿
 using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
+using RedditNet.Models.DatabaseModel;
+using RedditNet.PostFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Data.Common;
 
 namespace RedditNet.DataLayerFolder
 {
+
     public class DataLayerComments
     {
+        private readonly AppDbContext db;
+        public DataLayerComments(AppDbContext db)
+        {
+            this.db = db;
+        }   
+
         private bool hasPermission(User affectedUser, User requestingUser)
         {
             return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
         }
-        public void createComment(CommentNode node, Comment c)
+        public DatabaseComment? createComment(CommentNode node, Comment comment)
         {
-            if (DatabaseInterface.treeNodes.ContainsKey(c.PostId))
+            if (node.Parent != Constants.noParent)
             {
-                if (!DatabaseInterface.treeNodes[c.PostId].ContainsKey(c.Id))
+                DatabaseComment? parent = readComment(comment.PostId, node.Parent);
+                if (parent != null)
                 {
-                    DatabaseInterface.treeNodes[c.PostId][c.Id] = node;
-                    DatabaseInterface.comments[c.PostId][c.Id] = c;
+                    node.makeChildOf(new CommentNode(parent.Parent, parent.Depth, parent.Lineage, parent.Id));
                 }
+                else
+                    return null;
             }
-        }
 
-        public void deleteComment(string postId, int id, CommentDeleteModel c)
-        {
-            Comment deletedComment = readComment(postId, id);
-            User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedComment.UserId);
-            User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+            DatabaseMapper mapper = new DatabaseMapper();
+            DatabaseComment c = mapper.toDBComment(node, comment);
 
-            if (requestingUser != null)
+            try
             {
-                if (deletedComment != null && hasPermission(affectedUser, requestingUser))
-                {
-                    deletedComment.setDeletedState();
-                }
-            }
-            //if (DatabaseInterface.treeNodes.ContainsKey(postId))
-            //{
-            //    DatabaseInterface.treeNodes[postId].Remove(id);
-            //    DatabaseInterface.comments[postId].Remove(id);
-            //}
-        }
+                db.Add<DatabaseComment>(c);
+                db.SaveChanges();
 
-        public void updateComment(string postId, int id, CommentUpdateModel c)
-        {
-
-            Comment updatedComment = readComment(postId, id);
-            User affectedUser = DatabaseInterface.dataLayerUsers.readUser(updatedComment.UserId);
-            User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
-
-            if (requestingUser != null)
+                return c;
+            }catch(Exception)
             {
-                if (updatedComment != null && hasPermission(affectedUser, requestingUser))
-                {
-                    updatedComment.update(c);
-                }
+                return null;
             }
         }
 
-        public CommentNode readNode(string postId, int id)
+        //public void deleteComment(string postId, int id, CommentDeleteModel c)
+        //{
+        //    Comment deletedComment = readComment(postId, id);
+        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedComment.UserId);
+        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+
+        //    if (requestingUser != null)
+        //    {
+        //        if (deletedComment != null && hasPermission(affectedUser, requestingUser))
+        //        {
+        //            deletedComment.setDeletedState();
+        //        }
+        //    }
+        //    //if (DatabaseInterface.treeNodes.ContainsKey(postId))
+        //    //{
+        //    //    DatabaseInterface.treeNodes[postId].Remove(id);
+        //    //    DatabaseInterface.comments[postId].Remove(id);
+        //    //}
+        //}
+
+        //public void updateComment(string postId, int id, CommentUpdateModel c)
+        //{
+
+        //    Comment updatedComment = readComment(postId, id);
+        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(updatedComment.UserId);
+        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(c.UserId);
+
+        //    if (requestingUser != null)
+        //    {
+        //        if (updatedComment != null && hasPermission(affectedUser, requestingUser))
+        //        {
+        //            updatedComment.update(c);
+        //        }
+        //    }
+        //}
+
+        //public CommentNode readNode(string postId, int id)
+        //{
+        //    if (DatabaseInterface.treeNodes.ContainsKey(postId) && DatabaseInterface.treeNodes[postId].ContainsKey(id))
+        //    {
+        //        return DatabaseInterface.treeNodes[postId][id];
+        //    }
+
+        //    return null;
+        //}
+
+        public DatabaseComment? readComment(string postId, int id)
         {
-            if (DatabaseInterface.treeNodes.ContainsKey(postId) && DatabaseInterface.treeNodes[postId].ContainsKey(id))
+            try
             {
-                return DatabaseInterface.treeNodes[postId][id];
+                DatabaseComment? dbComment = (from b in db.Comments
+                                              where (b.PostId == postId) && (b.Id == id)
+                                              select b).FirstOrDefault<DatabaseComment>();
+                return dbComment;
             }
-
-            return null;
-        }
-
-        public Comment readComment(string postId, int id)
-        {
-            if (DatabaseInterface.comments.ContainsKey(postId) && DatabaseInterface.comments[postId].ContainsKey(id))
+            catch(Exception)
             {
-                return DatabaseInterface.comments[postId][id];
-            }
-
-            return null;
+                return null;
+            } 
         }
 
-        public List<CommentNode> getDescendants(string postId, int parentId, int cmpMethod = Constants.comparisonByTimeDesc)
+        public DatabaseComment? getPostParent(string postId)
         {
+            try
+            {
+                DatabaseComment? dbComment = (from b in db.Comments
+                                              where (b.PostId == postId) && (b.Parent == Constants.noParent)
+                                              select b).FirstOrDefault<DatabaseComment>();
+                return dbComment;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public List<CommentNode>? getDescendants(string postId, int parentId = Constants.noParent, int cmpMethod = Constants.comparisonByTimeDesc)
+        {
+            DatabaseComment? parent = parentId == Constants.noParent ? getPostParent(postId) : readComment(postId, parentId);
+
+            if (parent == null)
+                return null;
+
+            string prefix = parent.Lineage;
+
+            List<DatabaseComment> dbComms = (from b in db.Comments
+                                       where (b.PostId == postId) && (b.Lineage.StartsWith(prefix))
+                                       select b).ToList<DatabaseComment>();
+
             List<CommentNode> nodes = new List<CommentNode>();
-
-            Dictionary<int, CommentNode> tree = DatabaseInterface.treeNodes[postId];
-
-            string prefix = tree[parentId].Lineage;
-
-            foreach (CommentNode node in tree.Values)
+            foreach (DatabaseComment x in dbComms)
             {
-                if (node.Lineage.StartsWith(prefix))
-                    nodes.Add(node);
+                nodes.Add(new CommentNode(x.Parent, x.Depth, x.Lineage, x.Id));
             }
 
             Node root = BuildTreeAndGetRoots(nodes, cmpMethod).First();
@@ -170,7 +222,8 @@ namespace RedditNet.DataLayerFolder
                             x.Children.Sort(byTimeDesc);
                             break;
                     }
-                }else
+                }
+                else
                     x.Children.Sort(byTimeDesc);
             }
 

@@ -2,67 +2,99 @@
 using RedditNet.CommentFolder;
 using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
-using System.Collections.Generic;
-using System.Net;
+using RedditNet.Models.DatabaseModel;
+using RedditNet.UtilityFolder;
 
 namespace RedditNet.Controllers
 {
     public class CommentsController : Controller
     {
-        private static DataLayerComments d = DatabaseInterface.dataLayerComments;
+        private DataLayerComments dbComments;
+        public CommentsController(AppDbContext context)
+        {
+            dbComments = new DataLayerComments(context);
+        }
 
         [HttpGet("{postId}/comments/{commentId}")]
         public IActionResult Show(String postId, int commentId)
         {
-
-            Comment c = d.readComment(postId, commentId);
-
-            if (c != null)
+            DatabaseComment? dbComment = dbComments.readComment(postId, commentId);
+            if (dbComment != null)
             {
-                CommentMapper mapper = new CommentMapper();
-                CommentThreadModel m = mapper.toThreadModel(c, d.readNode(postId, commentId).Depth);
+                DatabaseMapper mapper = new DatabaseMapper();
+                CommentThreadModel cm = mapper.toThreadComment(dbComment);
 
-                return View(m);
+                return View(cm);
             }
-            
+
             return View("Error");
         }
 
-        [HttpPut("{postId}/comments/{commentId}")]
-        public IActionResult Edit(String postId, int commentId, [FromBody] CommentUpdateModel c)
-        {
-            // TODO 
-            // CHECK IF USER ALREADY VOTED
-            // POSSIBLE RACE CONDITION
-            d.updateComment(postId, commentId, c);
+        //[HttpPut("{postId}/comments/{commentId}")]
+        //public IActionResult Edit(String postId, int commentId, [FromBody] CommentUpdateModel c)
+        //{
+        //    // TODO 
+        //    // CHECK IF USER ALREADY VOTED
+        //    // POSSIBLE RACE CONDITION
+        //    d.updateComment(postId, commentId, c);
 
-            return Ok();
+        //    return Ok();
+        //}
+
+        [HttpGet("{postId}/comments/reply/{commentId}")]
+
+        public IActionResult CreateForm(String postId, int commentId)
+        {
+            CommentModel cm = new CommentModel();
+            cm.PostId = postId;
+            cm.Parent = commentId;
+
+            return View("Create", cm);
         }
+
+        [HttpGet("{postId}/comments")]
+        public IActionResult ListComments(String postId)
+        {
+            List<CommentNode>? nodes = dbComments.getDescendants(postId);
+            if (nodes == null)
+                return View("Error");
+
+            List<CommentThreadModel> result = new List<CommentThreadModel>();
+            foreach (CommentNode n in nodes)
+            {
+                DatabaseMapper mapper = new DatabaseMapper();
+                DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
+                if (dbc != null)
+                {
+                    result.Add(mapper.toThreadComment(dbc));
+                }
+            }
+
+            return View("AllComments", result);
+        }
+
 
         [HttpPost("{postId}/comments/{commentId}")]
-        public IActionResult Create(String postId, int commentId, [FromBody] CommentCreateModel c)
+        public IActionResult Create(String postId, int commentId, CommentCreateModel c)
         {
-            //Some Error checking maybe?
-            CommentNode parentNode = d.readNode(postId, commentId);
-            if (parentNode != null)
-            {
-                DatabaseInterface.idGenerator++;
-                CommentMapper mapper = new CommentMapper();
-                Comment newComment = mapper.createToComment(postId, DatabaseInterface.idGenerator, c);
-                CommentNode newNode = new CommentNode(DatabaseInterface.idGenerator, parentNode);
+            CommentMapper mapper = new CommentMapper();
+            Comment comment = mapper.createToComment(postId, c);
+            CommentNode n = new CommentNode(commentId);
 
-                d.createComment(newNode, newComment);
+            DatabaseComment? dbComment = dbComments.createComment(n, comment);
 
-            }
-            return Ok();
+            if (dbComment != null)
+                return RedirectToAction("Show", new { postId = dbComment.PostId, commentId = dbComment.Id});
+            Console.WriteLine("Bad");
+            return BadRequest();
         }
 
-        [HttpDelete("{postId}/comments/{commentId}")]
-        public IActionResult Delete(String postId, int commentId, [FromBody] CommentDeleteModel c)
-        {
-            d.deleteComment(postId, commentId, c);
-            return Ok();
-        }
+        //[HttpDelete("{postId}/comments/{commentId}")]
+        //public IActionResult Delete(String postId, int commentId, [FromBody] CommentDeleteModel c)
+        //{
+        //    d.deleteComment(postId, commentId, c);
+        //    return Ok();
+        //}
 
     }
 }
