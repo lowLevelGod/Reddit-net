@@ -139,5 +139,27 @@ namespace RedditNet.DataLayerFolder
 
             return result;
         }
+
+        public List<SubRedditPreviewModel>? getSubs()
+        {
+            List<SubRedditPreviewModel> result = new List<SubRedditPreviewModel>();
+            List<DatabaseSubReddit>? dbSubs = (from b in db.SubReddits
+                                               where (1 == 1)
+                                           select b).ToList<DatabaseSubReddit>();
+            if (dbSubs == null)
+                return null;
+
+            SubRedditMapper mapper = new SubRedditMapper();
+            DatabaseMapper dmapper = new DatabaseMapper();
+            foreach (DatabaseSubReddit x in dbSubs)
+            {
+                //String userName = DatabaseInterface.dataLayerUsers.readUser(p.UserId).UserName;
+                SubReddit sub = dmapper.toSubReddit(x);
+                SubRedditPreviewModel pm = mapper.toPreviewModel(sub);
+                result.Add(pm);
+            }
+
+            return result;
+        }
     }
 }

@@ -21,7 +21,7 @@
         String ident = (c.Depth * 24).ToString() + "px";
         <div style="margin-left : @ident">
             @c.Text
-            @c.Id
+            <a href="/@Model.SubId/@Model.Id/comments/reply/@c.Id"> Reply </a>
         </div>
     }
 }

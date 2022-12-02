@@ -22,12 +22,12 @@ namespace RedditNet.Models.DatabaseModel
             return comment;
         }
 
-        public CommentThreadModel toThreadComment(DatabaseComment c)
+        public CommentThreadModel toThreadComment(DatabaseComment c, String subId)
         {
             CommentMapper mapper = new CommentMapper();
             Comment comment = new Comment(c.PostId, c.Id, c.UserId, c.Text, c.Votes);
 
-            return mapper.toThreadModel(comment, c.Depth);
+            return mapper.toThreadModel(comment, subId, c.Depth);
         }
 
         public DatabasePost toDBPost(Post p)

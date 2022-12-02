@@ -4,6 +4,7 @@ using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.UtilityFolder;
+using System.Xml.Linq;
 
 namespace RedditNet.Controllers
 {
@@ -15,14 +16,14 @@ namespace RedditNet.Controllers
             dbComments = new DataLayerComments(context);
         }
 
-        [HttpGet("{postId}/comments/{commentId}")]
-        public IActionResult Show(String postId, int commentId)
+        [HttpGet("{subId}/{postId}/comments/{commentId}")]
+        public IActionResult Show(String subId, String postId, int commentId)
         {
             DatabaseComment? dbComment = dbComments.readComment(postId, commentId);
             if (dbComment != null)
             {
                 DatabaseMapper mapper = new DatabaseMapper();
-                CommentThreadModel cm = mapper.toThreadComment(dbComment);
+                CommentThreadModel cm = mapper.toThreadComment(dbComment, subId);
 
                 return View(cm);
             }
@@ -30,18 +31,18 @@ namespace RedditNet.Controllers
             return View("Error");
         }
 
-        [HttpPost("{postId}/comments/edit/{commentId}")]
-        public IActionResult Edit(String postId, int commentId, CommentUpdateModel c)
+        [HttpPost("{subId}/{postId}/comments/edit/{commentId}")]
+        public IActionResult Edit(String subId, String postId, int commentId, CommentUpdateModel c)
         {
             DatabaseComment? result = dbComments.updateComment(postId, commentId, c);  
             if (result != null)
-                return RedirectToAction("Show", new { postId = result.PostId, commentId = result.Id });
+                return RedirectToRoute("ShowPostComments", new { subId = subId, postId = postId});
 
             return BadRequest();
         }
 
-        [HttpGet("{postId}/comments/edit/{commentId}")]
-        public IActionResult EditForm(String postId, int commentId)
+        [HttpGet("{subId}/{postId}/comments/edit/{commentId}")]
+        public IActionResult EditForm(String subId, String postId, int commentId)
         {
             DatabaseComment? dbc = dbComments.readComment(postId, commentId);
             if (dbc != null)
@@ -52,6 +53,7 @@ namespace RedditNet.Controllers
                 cm.Text = dbc.Text;
                 cm.Votes = dbc.Votes;
                 cm.Id = dbc.Id;
+                cm.SubId = subId;
 
                 return View("Edit", cm);
             }
@@ -60,19 +62,20 @@ namespace RedditNet.Controllers
         }
 
 
-        [HttpGet("{postId}/comments/reply/{commentId}")]
+        [HttpGet("{subId}/{postId}/comments/reply/{commentId}")]
 
-        public IActionResult CreateForm(String postId, int commentId)
+        public IActionResult CreateForm(String subId, String postId, int commentId)
         {
             CommentCreateModel cm = new CommentCreateModel();
             cm.PostId = postId;
             cm.Parent = commentId;
+            cm.SubId = subId;
 
             return View("Create", cm);
         }
 
-        [HttpGet("{postId}/comments")]
-        public IActionResult ListComments(String postId)
+        [HttpGet("{subId}/{postId}/comments")]
+        public IActionResult ListComments(String subId, String postId)
         {
             List<CommentNode>? nodes = dbComments.getDescendants(postId);
             if (nodes == null)
@@ -85,7 +88,7 @@ namespace RedditNet.Controllers
                 DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
                 if (dbc != null)
                 {
-                    result.Add(mapper.toThreadComment(dbc));
+                    result.Add(mapper.toThreadComment(dbc, subId));
                 }
             }
 
@@ -93,8 +96,8 @@ namespace RedditNet.Controllers
         }
 
 
-        [HttpPost("{postId}/comments/{commentId}")]
-        public IActionResult Create(String postId, int commentId, CommentCreateModel c)
+        [HttpPost("{subId}/{postId}/comments/{commentId}")]
+        public IActionResult Create(String subId, String postId, int commentId, CommentCreateModel c)
         {
             CommentMapper mapper = new CommentMapper();
             Comment comment = mapper.createToComment(postId, c);
@@ -103,22 +106,22 @@ namespace RedditNet.Controllers
             DatabaseComment? dbComment = dbComments.createComment(n, comment);
 
             if (dbComment != null)
-                return RedirectToAction("Show", new { postId = dbComment.PostId, commentId = dbComment.Id});
+                return RedirectToRoute("ShowPostComments", new { subId = subId, postId = postId });
 
             return BadRequest();
         }
 
-        [HttpPost("{postId}/comments/delete/{commentId}")]
-        public IActionResult Delete(String postId, int commentId, CommentDeleteModel c)
+        [HttpPost("{subId}/{postId}/comments/delete/{commentId}")]
+        public IActionResult Delete(String subId, String postId, int commentId, CommentDeleteModel c)
         {
             if (dbComments.deleteComment(postId, commentId, c) == true)
-                return RedirectToAction("ListComments", new { postId = c.PostId });
+                return RedirectToRoute("ShowPostComments", new { subId = subId, postId = postId });
 
             return BadRequest();
         }
 
-        [HttpGet("{postId}/comments/delete/{commentId}")]
-        public IActionResult DeleteForm(String postId, int commentId)
+        [HttpGet("{subId}/{postId}/comments/delete/{commentId}")]
+        public IActionResult DeleteForm(String subId, String postId, int commentId)
         {
             DatabaseComment? dbc = dbComments.readComment(postId, commentId);
             if (dbc != null)
@@ -127,6 +130,7 @@ namespace RedditNet.Controllers
                 cm.PostId = dbc.PostId;
                 cm.UserId = dbc.UserId;
                 cm.Id = dbc.Id;
+                cm.SubId = subId;
 
                 return View("Delete", cm);
             }

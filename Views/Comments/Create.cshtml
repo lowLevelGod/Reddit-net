@@ -7,7 +7,7 @@
 @{
 }
 
-<form method="post" action="/@Model.PostId/comments/@Model.Parent">
+<form method="post" action="/@Model.SubId/@Model.PostId/comments/@Model.Parent">
     @Html.Label("UserId", "User ID")
     <br />
     @Html.TextBox("UserId", null, new { @class = "form-control" })

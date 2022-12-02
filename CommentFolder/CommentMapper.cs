@@ -4,7 +4,7 @@ namespace RedditNet.CommentFolder
 {
     public class CommentMapper
     {
-        public CommentThreadModel toThreadModel(Comment c, int depth = 0)
+        public CommentThreadModel toThreadModel(Comment c, String subId, int depth = 0)
         {
             CommentThreadModel result = new CommentThreadModel();
             result.Text = c.Text;
@@ -12,6 +12,7 @@ namespace RedditNet.CommentFolder
             result.Id = c.Id;
             result.Depth = depth;
             result.Votes = c.Votes;
+            result.SubId = subId;
 
             return result;
         }

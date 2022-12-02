@@ -20,5 +20,15 @@ namespace RedditNet.SubRedditFolder
         {
             return new SubReddit(m);
         }
+
+        public SubRedditPreviewModel toPreviewModel(SubReddit s)
+        {
+            SubRedditPreviewModel res = new SubRedditPreviewModel();
+            res.Description = s.Description;
+            res.Name = s.Name;
+            res.Id = s.Id;
+
+            return res;
+        }
     }
 }

@@ -102,7 +102,7 @@ namespace RedditNet.Controllers
             return null;
         }
 
-        [HttpGet("{subId}/posts/{postId}/comments")]
+        [HttpGet("{subId}/posts/{postId}/comments", Name = "ShowPostComments")]
         public IActionResult Show(String subId, String postId)
         {
             List<CommentNode>? nodes = dbComments.getDescendants(postId);
@@ -116,7 +116,7 @@ namespace RedditNet.Controllers
                 DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
                 if (dbc != null)
                 {
-                    comments.Add(mapper.toThreadComment(dbc));
+                    comments.Add(mapper.toThreadComment(dbc, subId));
                 }
             }
 

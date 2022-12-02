@@ -8,12 +8,14 @@
     var posts = Model.Posts;
     <h1>@Model.Name</h1>
     <p>Description: <b>@Model.Description</b></p>
-    
+
+    <p> <a href="/@Model.Id/posts/create">Create a new Post</a>.</p>
+
     <h2>Posts below</h2>
 
     foreach (var p in posts)
     {
-        <h1>Title: @p.Title</h1>
+        <h1><a href="/@Model.Id/posts/@p.Id/comments">@p.Title</a></h1>
         <p>Posted by: @p.UserName</p>
         <p>Votes: @p.Votes</p>
     }

@@ -1,8 +1,24 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using RedditNet.Models
+@model IEnumerable<RedditNet.Models.SubRedditModel.SubRedditPreviewModel>
+
+
+@{
+    ViewData["Title"] = "RedditNet";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to RedditNet</h1>
+    <p> <a href="/subs/create">Create a new SubReddit</a>.</p>
+    <h1>Existing SubReddits below! </h1>
+
+    @{
+        foreach (var s in Model)
+        {
+            <p>
+                <a href="/subs/@s.Id/posts">@s.Name</a>
+            <br />
+            @s.Description
+            </p>
+        }
+    }
 </div>

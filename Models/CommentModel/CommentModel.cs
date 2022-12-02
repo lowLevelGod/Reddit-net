@@ -7,5 +7,7 @@
         public int Id { get; set; }
 
         public String PostId { get; set; }
+
+        public String SubId { get; set; }
     }
 }
