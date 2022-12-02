@@ -5,5 +5,7 @@
         public String UserId { get; set; }
 
         public String SubId { get; set; }
+
+        public String Id { get; set; }
     }
 }

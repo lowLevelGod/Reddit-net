@@ -9,6 +9,7 @@ using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.Arm;
 
 namespace RedditNet.Controllers
 {
@@ -133,12 +134,33 @@ namespace RedditNet.Controllers
             return View("Error");
         }
 
-        //[HttpPut("{subId}/posts/{postId}")]
-        //public IActionResult Edit(String subId, String postId, [FromBody] PostUpdateModel p)
-        //{
-        //    dp.updatePost(subId, postId, p);
-        //    return Ok();
-        //}
+        [HttpPost("{subId}/posts/edit/{postId}")]
+        public IActionResult Edit(String subId, String postId, PostUpdateModel p)
+        {
+            DatabasePost? dbPost = dbPosts.updatePost(subId, postId, p);
+            if (dbPost != null)
+                return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
+
+            return BadRequest();
+        }
+
+        [HttpGet("{subId}/posts/edit/{postId}")]
+        public IActionResult EditForm(String subId, String postId)
+        {
+            DatabasePost? post = dbPosts.readPost(subId, postId);
+            if (post != null)
+            {
+                PostUpdateModel pm = new PostUpdateModel();
+                pm.Text = post.Text;
+                pm.SubId = post.SubId;
+                pm.UserId = post.UserId;
+                pm.Votes = post.Votes;
+                pm.Id = post.Id;
+
+                return View("Edit", pm);
+            }
+            return View("Error");
+        }
 
         [HttpPost("{subId}/posts/create")]
         public IActionResult Create(PostCreateModel p)
@@ -168,11 +190,29 @@ namespace RedditNet.Controllers
             return View("Create", cm);
         }
 
-        //[HttpDelete("{subId}/posts/{postId}")]
-        //public IActionResult Delete(String subId, String postId, [FromBody] PostDeleteModel p)
-        //{
-        //    dp.deletePost(subId, postId, p);
-        //    return Ok();
-        //}
+        [HttpPost("{subId}/posts/delete/{postId}")]
+        public IActionResult Delete(String subId, String postId, PostDeleteModel p)
+        {
+            if (dbPosts.deletePost(subId, postId, p) == true)
+                return Ok();
+            return BadRequest();
+        }
+
+        [HttpGet("{subId}/posts/delete/{postId}")]
+        public IActionResult DeleteForm(String subId, String postId, PostDeleteModel p)
+        {
+            DatabasePost? post = dbPosts.readPost(subId, postId);
+            if (post != null)
+            {
+                PostDeleteModel pm = new PostDeleteModel();
+                pm.SubId = post.SubId;
+                pm.UserId = post.UserId;
+                pm.Id = post.Id;
+
+                return View("Delete", pm);
+            }
+
+            return View("Error");
+        }
     }
 }

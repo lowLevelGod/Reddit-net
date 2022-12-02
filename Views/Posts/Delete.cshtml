@@ -1,0 +1,25 @@
+﻿@using RedditNet.Models
+@model RedditNet.Models.PostModel.PostDeleteModel
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<form method="post" action="/@Model.SubId/posts/delete/@Model.Id">
+    @Html.Label("Id", "ID")
+    <br />
+    @Html.TextBox("Id", Model.Id, new { @class = "form-control" })
+    <br /><br />
+    @Html.Label("UserId", "User ID")
+    <br />
+    @Html.TextBox("UserId", Model.UserId, new { @class = "form-control" })
+    <br /><br />
+    @Html.Label("SubId", "Sub ID")
+    <br />
+    @Html.TextBox("SubId", Model.SubId, new { @class = "form-control"
+    })
+    <br /><br />
+    <button type="submit">Delete Post</button>
+</form>

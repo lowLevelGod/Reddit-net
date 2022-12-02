@@ -41,46 +41,66 @@ namespace RedditNet.DataLayerFolder
             return null;
         }
 
-        //public void deletePost(string subId, string id, PostDeleteModel p)
-        //{
-        //    Post deletedPost = readPost(subId, id);
-        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(deletedPost.UserId);
-        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(p.UserId);
+        public bool deletePost(string subId, string id, PostDeleteModel p)
+        {
+            DatabasePost? dbp = readPost(subId, id);
+            if (dbp != null)
+            {
+                try
+                {
+                    List<DatabaseComment>? comments = (from b in db.Comments
+                                                       where (b.PostId == id)
+                                                       select b).ToList<DatabaseComment>();
+                    foreach (DatabaseComment comment in comments)
+                    {
+                        db.Remove<DatabaseComment>(comment);
+                    }
 
-        //    if (requestingUser != null)
-        //    {
-        //        if (deletedPost != null && hasPermission(affectedUser, requestingUser))
-        //        {
-        //            deletedPost.setDeletedState();
-        //        }
-        //    }
-        //    //if (DatabaseInterface.posts.ContainsKey(id))
-        //    //{
-        //    //    DatabaseInterface.posts.Remove(id);
-        //    //}
-        //}
+                    db.SaveChanges();
+                }
+                catch(Exception)
+                {
 
-        //public void updatePost(string subId, string id, PostUpdateModel p)
-        //{
-        //    //TO DO
-        //    //Implement updatedPost.update()
-        //    //Put properties in PostUpdateModel
+                }
+                try
+                {
+                    db.Remove<DatabasePost>(dbp);
+                    db.SaveChanges();
 
-        //    Post updatedPost = readPost(subId, id);
-        //    User affectedUser = DatabaseInterface.dataLayerUsers.readUser(updatedPost.UserId);
-        //    User requestingUser = DatabaseInterface.dataLayerUsers.readUser(p.UserId);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
 
-        //    if (requestingUser != null)
-        //    {
-        //        if (updatedPost != null)
-        //        {
-        //            if (hasPermission(affectedUser, requestingUser))
-        //                updatedPost.update(p);
-        //            if (p.SubId != null)
-        //                changeSubReddit(updatedPost.SubId, p.SubId, updatedPost.Id, requestingUser.Id);
-        //        }
-        //    }
-        //}
+            }
+
+            return false;
+        }
+
+        public DatabasePost? updatePost(string subId, string id, PostUpdateModel p)
+        {
+            DatabasePost? dbp = readPost(subId, id);
+            if (dbp != null)
+            {
+                try
+                {
+                    dbp.Text = p.Text;
+                    dbp.Votes = p.Votes;
+                    db.SaveChanges();
+
+                    return dbp;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
+            }
+
+            return null;
+        }
 
         public DatabasePost? readPost(string subId, string id)
         {
