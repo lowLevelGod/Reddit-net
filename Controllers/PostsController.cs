@@ -168,8 +168,6 @@ namespace RedditNet.Controllers
             PostMapper mapper = new PostMapper();
             Post post = mapper.createModelToPost(p);
 
-            Console.WriteLine(post.Text);
-
             DatabasePost? dbPost = dbPosts.createPost(post);
             if (dbPost != null)
             {

@@ -1,6 +1,7 @@
 ﻿using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.PostFolder;
+using RedditNet.SubRedditFolder;
 
 namespace RedditNet.Models.DatabaseModel
 {
@@ -45,6 +46,23 @@ namespace RedditNet.Models.DatabaseModel
         public Post toPost(DatabasePost p)
         {
             Post res = new Post(p.Title, p.UserId, p.Text, p.SubId, p.Id, p.Votes);
+
+            return res;
+        }
+
+        public DatabaseSubReddit toDBSubReddit(SubReddit s)
+        {
+            DatabaseSubReddit res = new DatabaseSubReddit();
+            res.Id = s.Id;
+            res.Name = s.Name;
+            res.Description = s.Description;
+
+            return res;
+        }
+
+        public SubReddit toSubReddit(DatabaseSubReddit s)
+        {
+            SubReddit res = new SubReddit(s.Name, s.Description, s.Id);
 
             return res;
         }
