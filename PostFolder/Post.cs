@@ -42,7 +42,7 @@ namespace RedditNet.PostFolder
         {
             Title = title;
             SubId = subId;
-            root = new CommentNode();
+            root = new CommentNode(0);
             if (id == null)
             {
                 Hash hash = new Hash();

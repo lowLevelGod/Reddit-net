@@ -17,10 +17,12 @@ namespace RedditNet.Controllers
     {
         private DataLayerPosts dbPosts;
         private DataLayerComments dbComments;
+        private DataLayerSubReddits dbSubs;
         public PostsController(AppDbContext context)
         {
             dbPosts = new DataLayerPosts(context);
             dbComments = new DataLayerComments(context);
+            dbSubs = new DataLayerSubReddits(context);
         }
         //TODO
         //Use [deleted] for posts with deleted user
@@ -102,10 +104,11 @@ namespace RedditNet.Controllers
             return null;
         }
 
-        [HttpGet("{subId}/posts/{postId}/comments", Name = "ShowPostComments")]
-        public IActionResult Show(String subId, String postId)
+        [HttpGet("{subId}/posts/{postId}/comments/{sortType?}", Name = "ShowPostComments")]
+        public IActionResult Show(String subId, String postId, int? sortType)
         {
-            List<CommentNode>? nodes = dbComments.getDescendants(postId);
+
+            List<CommentNode>? nodes = dbComments.getDescendants(postId, -1, sortType == null ? Constants.comparisonByTimeDesc : (int)sortType);
             if (nodes == null)
                 return View("Error");
 
@@ -126,7 +129,14 @@ namespace RedditNet.Controllers
             {
                 PostMapper pmapper = new PostMapper();
                 DatabaseMapper databaseMapper = new DatabaseMapper();
-                PostThreadModel result = pmapper.toThreadModel(comments, databaseMapper.toPost(dbPost));
+
+                DatabaseSubReddit? sub = dbSubs.readSubReddit(subId);
+                PostThreadModel result = pmapper.toThreadModel(comments, databaseMapper.toPost(dbPost), sub == null ? "" : sub.Name);
+
+                ViewBag.ByTimeAsc = Constants.comparisonByTimeAsc;
+                ViewBag.ByTimeDesc = Constants.comparisonByTimeDesc;
+                ViewBag.ByVotesAsc = Constants.comparisonByVotesAsc;
+                ViewBag.ByVotesDesc = Constants.comparisonByVotesDesc;
 
                 return View("Show", result);
             }
@@ -144,7 +154,7 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
-        [HttpGet("{subId}/posts/edit/{postId}")]
+        [HttpGet("{subId}/posts/edit/{postId}", Name = "EditPost")]
         public IActionResult EditForm(String subId, String postId)
         {
             DatabasePost? post = dbPosts.readPost(subId, postId);
@@ -156,6 +166,7 @@ namespace RedditNet.Controllers
                 pm.UserId = post.UserId;
                 pm.Votes = post.Votes;
                 pm.Id = post.Id;
+                pm.Title = post.Title;
 
                 return View("Edit", pm);
             }
@@ -196,7 +207,7 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
-        [HttpGet("{subId}/posts/delete/{postId}")]
+        [HttpGet("{subId}/posts/delete/{postId}", Name = "DeletePost")]
         public IActionResult DeleteForm(String subId, String postId, PostDeleteModel p)
         {
             DatabasePost? post = dbPosts.readPost(subId, postId);
@@ -206,6 +217,7 @@ namespace RedditNet.Controllers
                 pm.SubId = post.SubId;
                 pm.UserId = post.UserId;
                 pm.Id = post.Id;
+                pm.Title = post.Title;
 
                 return View("Delete", pm);
             }

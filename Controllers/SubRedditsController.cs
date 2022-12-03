@@ -21,13 +21,13 @@ namespace RedditNet.Controllers
         ////TODO
         ////MOVE POST TO OTHER SUBREDDIT
 
-        [HttpGet("subs/{subId}/posts")]
-        public IActionResult Show(String subId)
+        [HttpGet("subs/{subId}/posts/{start}", Name = "ShowSubPosts")]
+        public IActionResult Show(String subId, int start)
         {
             DatabaseSubReddit? s = dbSubs.readSubReddit(subId);
             if (s != null)
             {
-                List<PostPreviewModel>? pm = dbSubs.getPosts(subId);
+                List<PostPreviewModel>? pm = dbSubs.getPosts(subId, start);
                 if (pm != null)
                 {
                     SubRedditMapper mapper = new SubRedditMapper();
@@ -35,6 +35,8 @@ namespace RedditNet.Controllers
                     SubReddit sub = dmapper.toSubReddit(s);
 
                     SubRedditPostsModel result = mapper.toPostsModel(pm, sub);
+
+                    ViewBag.Page = start;
 
                     return View("Show", result);
                 }
@@ -48,12 +50,12 @@ namespace RedditNet.Controllers
         {
             DatabaseSubReddit? dbSub = dbSubs.updateSubReddit(subId, m);
             if (dbSub != null)
-                return RedirectToAction("Show", new { subId = dbSub.Id });
+                return RedirectToAction("Show", new { subId = dbSub.Id, start = 0 });
 
             return BadRequest();
         }
 
-        [HttpGet("subs/edit/{subId}")]
+        [HttpGet("subs/edit/{subId}", Name = "EditSub")]
         public IActionResult EditForm(String subId)
         {
             DatabaseSubReddit? sub = dbSubs.readSubReddit(subId);
@@ -61,6 +63,7 @@ namespace RedditNet.Controllers
             {
                 SubRedditUpdateModel pm = new SubRedditUpdateModel();
                 pm.Description = sub.Description;
+                pm.Name = sub.Name;
                 pm.Id = sub.Id;
                 pm.UserId = "user id here";
 
@@ -79,7 +82,7 @@ namespace RedditNet.Controllers
             
             if (res != null)
             {
-                return RedirectToAction("Show", new { subId = res.Id });
+                return RedirectToAction("Show", new { subId = res.Id, start = 0 });
             }
 
             return BadRequest();
@@ -104,7 +107,7 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
-        [HttpGet("subs/delete/{subId}")]
+        [HttpGet("subs/delete/{subId}", Name = "DeleteSub")]
         public IActionResult DeleteForm(String subId)
         {
             DatabaseSubReddit? sub = dbSubs.readSubReddit(subId);
@@ -112,6 +115,7 @@ namespace RedditNet.Controllers
             {
                 SubRedditDeleteModel pm = new SubRedditDeleteModel();
                 pm.Id = sub.Id;
+                pm.Name = sub.Name;
                 pm.UserId = "user id here";
 
                 return View("Delete", pm);

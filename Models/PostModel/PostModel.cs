@@ -7,5 +7,6 @@
         public String SubId { get; set; }
 
         public String Id { get; set; }
+        public String Title { get; set; }
     }
 }

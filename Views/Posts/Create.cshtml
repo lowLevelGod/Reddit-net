@@ -7,6 +7,8 @@
 @{
 }
 
+<h1><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})">Back to posts</a></h1>
+
 <form method="post" action="/@Model.SubId/posts/create">
     @Html.Label("UserId", "User ID")
     <br />

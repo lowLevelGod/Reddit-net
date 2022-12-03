@@ -8,6 +8,7 @@ namespace RedditNet.CommentFolder
         private int parent;
         private int depth;
         private string lineage;
+        private int votes;
 
         public int CompareTo(CommentNode other)
         {
@@ -27,12 +28,13 @@ namespace RedditNet.CommentFolder
             Depth = parent.Depth + 1;
             Lineage = joinLineage(parent.Lineage, parent.Id);
         }
-        public CommentNode(int parent = Constants.noParent, int depth = 0, string lineage = "/", int id = 0)
+        public CommentNode(int votes, int parent = Constants.noParent, int depth = 0, string lineage = "/", int id = 0)
         {
             Id = id;
             Parent = parent;
             Depth = depth;
             Lineage = lineage;
+            Votes = votes;
         }
 
         public CommentNode(int id, CommentNode parent)
@@ -45,5 +47,6 @@ namespace RedditNet.CommentFolder
         public int Parent { get => parent; set => parent = value; }
         public int Depth { get => depth; set => depth = value; }
         public string Lineage { get => lineage; set => lineage = value; }
+        public int Votes { get => votes; set => votes = value; }
     }
 }

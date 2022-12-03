@@ -6,14 +6,22 @@
 *@
 @{
     <h1>@Model.Title</h1>
-    <p>Post id: <b>@Model.Id </b></p>
+    <h2><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})">@Model.SubName</a></h2>
     <p>Votes: <b>@Model.Votes</b></p>
     <p>User id: <b>@Model.UserId</b></p>
-    <p>Content: <b>@Model.Text</b></p>
+    <p><b>@Model.Text</b></p>
+   
+    <a href="@Url.RouteUrl("EditPost", new {subId = Model.SubId, postId = Model.Id})">Edit</a>
+    <a href="@Url.RouteUrl("DeletePost", new {subId = Model.SubId, postId = Model.Id})">Delete</a>
 
     <br />
 
     <h1>Comment section below! </h1>
+    <p>Sort by</p>
+    <a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByTimeAsc"> Newest </a>
+    <a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByTimeDesc"> Oldest </a>
+    <a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByVotesDesc"> Top </a>
+    <a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByVotesAsc"> Controversial </a>
 
     var comments = Model.Comments;
     foreach (var c in comments)
@@ -21,7 +29,10 @@
         String ident = (c.Depth * 24).ToString() + "px";
         <div style="margin-left : @ident">
             @c.Text
-            <a href="/@Model.SubId/@Model.Id/comments/reply/@c.Id"> Reply </a>
+            @c.Votes
+            <a href="@Url.RouteUrl("CreateComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})">Reply</a>
+            <a href="@Url.RouteUrl("EditComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})">Edit</a>
+            <a href="@Url.RouteUrl("DeleteComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})">Delete</a>
         </div>
     }
 }

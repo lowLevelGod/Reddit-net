@@ -21,6 +21,7 @@ namespace RedditNet.Controllers
             dbSubs = new DataLayerSubReddits(context);
             _logger = logger;
         }
+        
         public IActionResult Index()
         {
             List<SubRedditPreviewModel>? result = dbSubs.getSubs();

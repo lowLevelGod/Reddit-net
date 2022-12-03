@@ -32,7 +32,7 @@ namespace RedditNet.DataLayerFolder
                 DatabaseComment? parent = readComment(comment.PostId, node.Parent);
                 if (parent != null)
                 {
-                    node.makeChildOf(new CommentNode(parent.Parent, parent.Depth, parent.Lineage, parent.Id));
+                    node.makeChildOf(new CommentNode(parent.Votes, parent.Parent, parent.Depth, parent.Lineage, parent.Id));
                 }
                 else
                     return null;
@@ -154,7 +154,7 @@ namespace RedditNet.DataLayerFolder
             List<CommentNode> nodes = new List<CommentNode>();
             foreach (DatabaseComment x in dbComms)
             {
-                nodes.Add(new CommentNode(x.Parent, x.Depth, x.Lineage, x.Id));
+                nodes.Add(new CommentNode(x.Votes, x.Parent, x.Depth, x.Lineage, x.Id));
             }
 
             Node root = BuildTreeAndGetRoots(nodes, cmpMethod).First();
@@ -227,6 +227,12 @@ namespace RedditNet.DataLayerFolder
                         case Constants.comparisonByTimeDesc:
                             x.Children.Sort(byTimeDesc);
                             break;
+                        case Constants.comparisonByVotesAsc:
+                            x.Children.Sort(byVotesAsc);
+                            break;
+                        case Constants.comparisonByVotesDesc:
+                            x.Children.Sort(byVotesDesc);
+                            break;
                         default:
                             x.Children.Sort(byTimeDesc);
                             break;
@@ -244,9 +250,19 @@ namespace RedditNet.DataLayerFolder
             return object1.commentNode.CompareTo(object2.commentNode);
         };
 
+        static Comparison<Node> byVotesDesc = delegate (Node object1, Node object2)
+        {
+            return object1.commentNode.Votes.CompareTo(object2.commentNode.Votes);
+        };
+
         static Comparison<Node> byTimeAsc = delegate (Node object1, Node object2)
         {
             return -object1.commentNode.CompareTo(object2.commentNode);
+        };
+
+        static Comparison<Node> byVotesAsc = delegate (Node object1, Node object2)
+        {
+            return -object1.commentNode.Votes.CompareTo(object2.commentNode.Votes);
         };
 
     }

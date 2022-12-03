@@ -41,7 +41,7 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
-        [HttpGet("{subId}/{postId}/comments/edit/{commentId}")]
+        [HttpGet("{subId}/{postId}/comments/edit/{commentId}", Name = "EditComment")]
         public IActionResult EditForm(String subId, String postId, int commentId)
         {
             DatabaseComment? dbc = dbComments.readComment(postId, commentId);
@@ -62,7 +62,7 @@ namespace RedditNet.Controllers
         }
 
 
-        [HttpGet("{subId}/{postId}/comments/reply/{commentId}")]
+        [HttpGet("{subId}/{postId}/comments/reply/{commentId}", Name = "CreateComment")]
 
         public IActionResult CreateForm(String subId, String postId, int commentId)
         {
@@ -120,7 +120,7 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
-        [HttpGet("{subId}/{postId}/comments/delete/{commentId}")]
+        [HttpGet("{subId}/{postId}/comments/delete/{commentId}", Name = "DeleteComment")]
         public IActionResult DeleteForm(String subId, String postId, int commentId)
         {
             DatabaseComment? dbc = dbComments.readComment(postId, commentId);

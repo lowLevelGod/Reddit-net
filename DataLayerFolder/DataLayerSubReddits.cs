@@ -1,9 +1,11 @@
-﻿using RedditNet.Models.DatabaseModel;
+﻿
+using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
 using RedditNet.Models.SubRedditModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
+using RedditNet.UtilityFolder;
 using System;
 
 namespace RedditNet.DataLayerFolder
@@ -118,12 +120,12 @@ namespace RedditNet.DataLayerFolder
             return null;
         }
 
-        public List<PostPreviewModel>? getPosts(String id)
+        public List<PostPreviewModel>? getPosts(String id, int start)
         {
             List<PostPreviewModel> result = new List<PostPreviewModel>();
             List<DatabasePost>? dbPosts = (from b in db.Posts
                                              where (b.SubId == id)
-                                             select b).ToList<DatabasePost>();
+                                             select b).OrderBy(o => o.Id).Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabasePost>();
             if (dbPosts == null)
                 return null;
 

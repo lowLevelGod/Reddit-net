@@ -14,5 +14,7 @@
         public const int comparisonByTimeDesc = 1;
         public const int comparisonByVotesAsc = 2;
         public const int comparisonByVotesDesc = 3;
+
+        public const int pageSizePosts = 5;
     }
 }
