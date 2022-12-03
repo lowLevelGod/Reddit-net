@@ -19,11 +19,13 @@ namespace RedditNet.Models.DatabaseModel
         [Required]
         public string PostId { get; set; }
 
-        public string UserId { get; set; }
+        //public string UserId { get; set; }
 
         public string Text { get; set; }
 
         public int Votes { get; set; }
+
+        public virtual DatabaseUser User { get; set; }
 
     }
 }

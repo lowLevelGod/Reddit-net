@@ -18,11 +18,13 @@ namespace RedditNet.Controllers
         private DataLayerPosts dbPosts;
         private DataLayerComments dbComments;
         private DataLayerSubReddits dbSubs;
+        private DataLayerUsers dbUsers;
         public PostsController(AppDbContext context)
         {
             dbPosts = new DataLayerPosts(context);
             dbComments = new DataLayerComments(context);
             dbSubs = new DataLayerSubReddits(context);
+            dbUsers = new DataLayerUsers(context);
         }
         //TODO
         //Use [deleted] for posts with deleted user
@@ -163,7 +165,7 @@ namespace RedditNet.Controllers
                 PostUpdateModel pm = new PostUpdateModel();
                 pm.Text = post.Text;
                 pm.SubId = post.SubId;
-                pm.UserId = post.UserId;
+                pm.UserId = post.User.Id;
                 pm.Votes = post.Votes;
                 pm.Id = post.Id;
                 pm.Title = post.Title;
@@ -179,7 +181,7 @@ namespace RedditNet.Controllers
             PostMapper mapper = new PostMapper();
             Post post = mapper.createModelToPost(p);
 
-            DatabasePost? dbPost = dbPosts.createPost(post);
+            DatabasePost? dbPost = dbPosts.createPost(post, p.UserId);
             if (dbPost != null)
             {
                 return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
@@ -215,7 +217,7 @@ namespace RedditNet.Controllers
             {
                 PostDeleteModel pm = new PostDeleteModel();
                 pm.SubId = post.SubId;
-                pm.UserId = post.UserId;
+                pm.UserId = post.User.Id;
                 pm.Id = post.Id;
                 pm.Title = post.Title;
 

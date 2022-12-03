@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>aspnet-WebApplication1-8A9AB92B-C853-446F-93BC-15F97CC7D54E</UserSecretsId>
+    <UserSecretsId>aspnet-RedditNet-8A9AB92B-C853-446F-93BC-15F97CC7D54E</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -20,23 +20,23 @@ namespace RedditNet.UserFolder
                     return "guest";
             }
         }
-        public UserShowModel toShowModel(User u)
-        {
-            UserShowModel result = new UserShowModel();
-            result.Id = u.Id;
-            result.UserName = u.UserName;
-            result.Role = roleToString(u.Role);
-            result.Email = u.Email;
-            result.Description = u.Description;
+        //public UserShowModel toShowModel(User u)
+        //{
+        //    UserShowModel result = new UserShowModel();
+        //    result.Id = u.Id;
+        //    result.UserName = u.UserName;
+        //    result.Role = roleToString(u.Role);
+        //    result.Email = u.Email;
+        //    result.Description = u.Description;
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public User createModelToUser(UserCreateModel u)
-        {
-            User result = new User(u.UserName, u.Password, u.Email, u.Description, Constants.regular);
+        //public User createModelToUser(UserCreateModel u)
+        //{
+        //    User result = new User(u.UserName, u.Password, u.Email, u.Description, Constants.regular);
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

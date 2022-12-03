@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RedditNet;
 
@@ -11,9 +12,10 @@ using RedditNet;
 namespace RedditNet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221203201349_Initial3")]
+    partial class Initial3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -186,14 +188,13 @@ namespace RedditNet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Votes")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("Id", "PostId")
                         .IsUnique();
@@ -219,7 +220,8 @@ namespace RedditNet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Votes")
                         .HasColumnType("int");
@@ -228,8 +230,6 @@ namespace RedditNet.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
@@ -247,15 +247,10 @@ namespace RedditNet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Id")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("SubReddits");
                 });
@@ -374,33 +369,6 @@ namespace RedditNet.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("RedditNet.Models.DatabaseModel.DatabaseComment", b =>
-                {
-                    b.HasOne("RedditNet.Models.DatabaseModel.DatabaseUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("RedditNet.Models.DatabaseModel.DatabasePost", b =>
-                {
-                    b.HasOne("RedditNet.Models.DatabaseModel.DatabaseUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("RedditNet.Models.DatabaseModel.DatabaseSubReddit", b =>
-                {
-                    b.HasOne("RedditNet.Models.DatabaseModel.DatabaseUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,7 +4,7 @@ using RedditNet.Models.DatabaseModel;
 
 namespace RedditNet
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<DatabaseUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext>
         options)

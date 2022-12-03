@@ -12,5 +12,7 @@ namespace RedditNet.Models.DatabaseModel
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public virtual DatabaseUser User { get; set; }
     }
 }

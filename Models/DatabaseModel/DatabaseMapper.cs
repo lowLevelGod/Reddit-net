@@ -7,7 +7,7 @@ namespace RedditNet.Models.DatabaseModel
 {
     public class DatabaseMapper
     {
-        public DatabaseComment toDBComment(CommentNode n, Comment c)
+        public DatabaseComment toDBComment(CommentNode n, Comment c, DatabaseUser user)
         {
             DatabaseComment comment = new DatabaseComment();
             comment.Id = 0;
@@ -16,7 +16,7 @@ namespace RedditNet.Models.DatabaseModel
             comment.Parent = n.Parent;
             comment.Votes = c.Votes;
             comment.Text = c.Text;
-            comment.UserId = c.UserId;
+            comment.User = user;
             comment.Lineage = n.Lineage;
 
             return comment;
@@ -25,19 +25,19 @@ namespace RedditNet.Models.DatabaseModel
         public CommentThreadModel toThreadComment(DatabaseComment c, String subId)
         {
             CommentMapper mapper = new CommentMapper();
-            Comment comment = new Comment(c.PostId, c.Id, c.UserId, c.Text, c.Votes);
+            Comment comment = new Comment(c.PostId, c.Id, c.User.Id, c.Text, c.Votes);
 
             return mapper.toThreadModel(comment, subId, c.Depth);
         }
 
-        public DatabasePost toDBPost(Post p)
+        public DatabasePost toDBPost(Post p, DatabaseUser user)
         {
             DatabasePost res = new DatabasePost();
             res.Text = p.Text;
             res.Title = p.Title;
             res.Votes = p.Votes;
             res.Id = p.Id;
-            res.UserId = p.UserId;
+            res.User = user;
             res.SubId = p.SubId;
 
             return res;
@@ -45,7 +45,7 @@ namespace RedditNet.Models.DatabaseModel
 
         public Post toPost(DatabasePost p)
         {
-            Post res = new Post(p.Title, p.UserId, p.Text, p.SubId, p.Id, p.Votes);
+            Post res = new Post(p.Title, p.User.Id, p.Text, p.SubId, p.Id, p.Votes);
 
             return res;
         }

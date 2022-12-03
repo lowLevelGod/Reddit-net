@@ -1,5 +1,6 @@
 ﻿
 using RedditNet.CommentFolder;
+using RedditNet.Migrations;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.PostFolder;
@@ -21,11 +22,11 @@ namespace RedditNet.DataLayerFolder
             this.db = db;
         }   
 
-        private bool hasPermission(User affectedUser, User requestingUser)
-        {
-            return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
-        }
-        public DatabaseComment? createComment(CommentNode node, Comment comment)
+        //private bool hasPermission(User affectedUser, User requestingUser)
+        //{
+        //    return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
+        //}
+        public DatabaseComment? createComment(CommentNode node, Comment comment, String userId)
         {
             if (node.Parent != Constants.noParent)
             {
@@ -38,8 +39,9 @@ namespace RedditNet.DataLayerFolder
                     return null;
             }
 
+            DatabaseUser? user = new DataLayerUsers(db).readUser(userId);
             DatabaseMapper mapper = new DatabaseMapper();
-            DatabaseComment c = mapper.toDBComment(node, comment);
+            DatabaseComment c = mapper.toDBComment(node, comment, user);
 
             try
             {

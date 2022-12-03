@@ -11,6 +11,7 @@ namespace RedditNet.Controllers
     public class CommentsController : Controller
     {
         private DataLayerComments dbComments;
+        private DataLayerUsers dbUsers;
         public CommentsController(AppDbContext context)
         {
             dbComments = new DataLayerComments(context);
@@ -49,7 +50,7 @@ namespace RedditNet.Controllers
             {
                 CommentUpdateModel cm = new CommentUpdateModel();
                 cm.PostId = dbc.PostId;
-                cm.UserId = dbc.UserId;
+                cm.UserId = dbc.User.Id;
                 cm.Text = dbc.Text;
                 cm.Votes = dbc.Votes;
                 cm.Id = dbc.Id;
@@ -103,7 +104,7 @@ namespace RedditNet.Controllers
             Comment comment = mapper.createToComment(postId, c);
             CommentNode n = new CommentNode(commentId);
 
-            DatabaseComment? dbComment = dbComments.createComment(n, comment);
+            DatabaseComment? dbComment = dbComments.createComment(n, comment, c.UserId);
 
             if (dbComment != null)
                 return RedirectToRoute("ShowPostComments", new { subId = subId, postId = postId });
@@ -128,7 +129,7 @@ namespace RedditNet.Controllers
             {
                 CommentDeleteModel cm = new CommentDeleteModel();
                 cm.PostId = dbc.PostId;
-                cm.UserId = dbc.UserId;
+                cm.UserId = dbc.User.Id;
                 cm.Id = dbc.Id;
                 cm.SubId = subId;
 

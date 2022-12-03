@@ -17,8 +17,10 @@ namespace RedditNet.Models.DatabaseModel
         [ForeignKey(nameof(DatabaseSubReddit))]
         [Required]
         public string SubId { get; set; }
-        public string UserId { get; set; }
+        //public string UserId { get; set; }
         public string Text { get; set; }
         public int Votes { get; set; }
+
+        public virtual DatabaseUser User { get; set; }
     }
 }
