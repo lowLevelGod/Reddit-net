@@ -10,15 +10,6 @@
 <h1><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.PostId})">Back to comments</a></h1>
 
 <form method="post" action="/@Model.SubId/@Model.PostId/comments/@Model.Parent">
-    @Html.Label("UserId", "User ID")
-    <br />
-    @Html.TextBox("UserId", null, new { @class = "form-control" })
-    <br /><br />
-    @Html.Label("PostId", "Post ID")
-    <br />
-    @Html.TextBox("PostId", null, new { @class = "form-control"
-    })
-    <br /><br />
     @Html.Label("Text", "Text here")
     <br />
     @Html.TextBox("Text", null, new { @class = "form-control" })

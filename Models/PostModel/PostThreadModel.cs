@@ -8,6 +8,7 @@ namespace RedditNet.Models.PostModel
 
         public int? Votes { get; set; }
         public String SubName { get; set; }
+        public String UserName { get; set; }
 
         public List<CommentThreadModel> Comments { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using RedditNet.Models.DatabaseModel;
+﻿using Microsoft.AspNetCore.Identity;
+using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.UserModel;
 using RedditNet.UserFolder;
 
@@ -7,10 +8,14 @@ namespace RedditNet.DataLayerFolder
 
     public class DataLayerUsers
     {
-        private readonly AppDbContext db;
-        public DataLayerUsers(AppDbContext db)
+        private readonly UserManager<DatabaseUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public DataLayerUsers(
+            UserManager<DatabaseUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
-            this.db = db;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         //private bool hasPermission(User affectedUser, User requestingUser)
         //{
@@ -28,7 +33,7 @@ namespace RedditNet.DataLayerFolder
         {
             try
             {
-                DatabaseUser? p = (from b in db.Users
+                DatabaseUser? p = (from b in _userManager.Users
                                         where (b.Id == id)
                                         select b).FirstOrDefault<DatabaseUser>();
 

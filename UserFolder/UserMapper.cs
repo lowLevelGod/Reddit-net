@@ -1,4 +1,5 @@
 ﻿
+using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.UserModel;
 using RedditNet.UtilityFolder;
 
@@ -20,17 +21,17 @@ namespace RedditNet.UserFolder
                     return "guest";
             }
         }
-        //public UserShowModel toShowModel(User u)
-        //{
-        //    UserShowModel result = new UserShowModel();
-        //    result.Id = u.Id;
-        //    result.UserName = u.UserName;
-        //    result.Role = roleToString(u.Role);
-        //    result.Email = u.Email;
-        //    result.Description = u.Description;
+        public UserShowModel toShowModel(DatabaseUser u, string role)
+        {
+            UserShowModel result = new UserShowModel();
+            result.Id = u.Id;
+            result.UserName = u.UserName;
+            result.Role = role;
+            result.Email = u.Email;
+            //result.Description = u.Description;
 
-        //    return result;
-        //}
+            return result;
+        }
 
         //public User createModelToUser(UserCreateModel u)
         //{

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using RedditNet.CommentFolder;
 using RedditNet.DataLayerFolder;
+using RedditNet.Migrations;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
@@ -8,6 +11,7 @@ using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
+using System.Data;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
 
@@ -19,12 +23,21 @@ namespace RedditNet.Controllers
         private DataLayerComments dbComments;
         private DataLayerSubReddits dbSubs;
         private DataLayerUsers dbUsers;
-        public PostsController(AppDbContext context)
+
+        private readonly UserManager<DatabaseUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public PostsController(
+            AppDbContext context,
+            UserManager<DatabaseUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             dbPosts = new DataLayerPosts(context);
             dbComments = new DataLayerComments(context);
             dbSubs = new DataLayerSubReddits(context);
-            dbUsers = new DataLayerUsers(context);
+            dbUsers = new DataLayerUsers(userManager, roleManager);
+
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         //TODO
         //Use [deleted] for posts with deleted user
@@ -119,6 +132,7 @@ namespace RedditNet.Controllers
             {
                 DatabaseMapper mapper = new DatabaseMapper();
                 DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
+                Console.WriteLine(dbc.Text);
                 if (dbc != null)
                 {
                     comments.Add(mapper.toThreadComment(dbc, subId));
@@ -133,7 +147,10 @@ namespace RedditNet.Controllers
                 DatabaseMapper databaseMapper = new DatabaseMapper();
 
                 DatabaseSubReddit? sub = dbSubs.readSubReddit(subId);
-                PostThreadModel result = pmapper.toThreadModel(comments, databaseMapper.toPost(dbPost), sub == null ? "" : sub.Name);
+                PostThreadModel result = pmapper.toThreadModel(
+                    comments, 
+                    databaseMapper.toPost(dbPost), sub == null ? "" : sub.Name,
+                    dbPost.User.UserName);
 
                 ViewBag.ByTimeAsc = Constants.comparisonByTimeAsc;
                 ViewBag.ByTimeDesc = Constants.comparisonByTimeDesc;
@@ -175,13 +192,16 @@ namespace RedditNet.Controllers
             return View("Error");
         }
 
+        [Authorize(Roles = "Regular, Moderator, Admin")]
         [HttpPost("{subId}/posts/create")]
         public IActionResult Create(PostCreateModel p)
         {
             PostMapper mapper = new PostMapper();
             Post post = mapper.createModelToPost(p);
 
-            DatabasePost? dbPost = dbPosts.createPost(post, p.UserId);
+            DatabaseUser? user = dbUsers.readUser(_userManager.GetUserId(User));
+            Console.WriteLine(user.Id);
+            DatabasePost? dbPost = dbPosts.createPost(post, user);
             if (dbPost != null)
             {
                 return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
@@ -189,13 +209,14 @@ namespace RedditNet.Controllers
             return BadRequest();
         }
 
+        [Authorize(Roles = "Regular, Moderator, Admin")]
         [HttpGet("{subId}/posts/create")]
         public IActionResult CreateForm(String subId)
         {
             PostCreateModel cm = new PostCreateModel();
             cm.Title = "";
             cm.Text = "";
-            cm.UserId = "";
+            cm.UserId = _userManager.GetUserId(User);
             cm.SubId = subId;
 
             return View("Create", cm);

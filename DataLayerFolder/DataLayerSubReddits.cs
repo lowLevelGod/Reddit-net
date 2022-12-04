@@ -52,14 +52,14 @@ namespace RedditNet.DataLayerFolder
                 try
                 {
                     List<DatabasePost>? posts = (from b in db.Posts
-                                                       where (b.SubId == dbs.Id)
-                                                       select b).ToList<DatabasePost>();
+                                                 where (b.SubId == dbs.Id)
+                                                 select b).ToList<DatabasePost>();
+                    DataLayerPosts dp = new DataLayerPosts(db);
                     foreach (DatabasePost post in posts)
                     {
-                        db.Remove<DatabasePost>(post);
+                        dp.deletePost(post.SubId, post.Id, new PostDeleteModel());
                     }
 
-                    db.SaveChanges();
                 }
                 catch (Exception)
                 {

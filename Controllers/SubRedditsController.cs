@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using RedditNet.DataLayerFolder;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
@@ -12,10 +14,15 @@ namespace RedditNet.Controllers
     {
         private DataLayerPosts dbPosts;
         private DataLayerSubReddits dbSubs;
-        public SubRedditsController(AppDbContext context)
+        private DataLayerUsers dbUsers;
+        public SubRedditsController(
+            AppDbContext context,
+            UserManager<DatabaseUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             dbPosts = new DataLayerPosts(context);
             dbSubs = new DataLayerSubReddits(context);
+            dbUsers = new DataLayerUsers(userManager, roleManager);
         }
 
         ////TODO

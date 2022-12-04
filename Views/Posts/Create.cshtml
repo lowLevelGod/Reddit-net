@@ -10,15 +10,6 @@
 <h1><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})">Back to posts</a></h1>
 
 <form method="post" action="/@Model.SubId/posts/create">
-    @Html.Label("UserId", "User ID")
-    <br />
-    @Html.TextBox("UserId", Model.UserId, new { @class = "form-control" })
-    <br /><br />
-    @Html.Label("SubId", "Sub ID")
-    <br />
-    @Html.TextBox("SubId", Model.SubId, new { @class = "form-control"
-    })
-    <br /><br />
     @Html.Label("Title", "Title here")
     <br />
     @Html.TextBox("Title", Model.Title, new { @class = "form-control" })

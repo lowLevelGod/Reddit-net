@@ -6,10 +6,17 @@
 *@
 @{
     <h1>@Model.UserName's Profile</h1>
-
-    <p>User id: <b>@Model.Id</b></p>
     <p>Email: <b>@Model.Email</b></p>
     <p>Description: <b>@Model.Description</b></p>
     <p>Role: <b>@Model.Role</b></p>
 
+    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
+        <button type="submit">Change to Regular</button>
+    </form>
+    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Moderator"})">
+        <button type="submit">Change to Moderator</button>
+    </form>
+    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Admin"})">
+        <button type="submit">Change to Admin</button>
+    </form>
 }

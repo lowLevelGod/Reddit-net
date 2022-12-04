@@ -10,19 +10,6 @@
 <h1><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})">@Model.Title</a></h1>
 
 <form method="post" action="/@Model.SubId/posts/edit/@Model.Id">
-    @Html.Label("Id", "ID")
-    <br />
-    @Html.TextBox("Id", Model.Id, new { @class = "form-control" })
-    <br /><br />
-    @Html.Label("UserId", "User ID")
-    <br />
-    @Html.TextBox("UserId", Model.UserId, new { @class = "form-control" })
-    <br /><br />
-    @Html.Label("SubId", "Sub ID")
-    <br />
-    @Html.TextBox("SubId", Model.SubId, new { @class = "form-control"
-    })
-    <br /><br />
     @Html.Label("Votes", "Upvotes/Downvotes")
     <br />
     @Html.TextBox("Votes", Model.Votes, new { @class = "form-control" })

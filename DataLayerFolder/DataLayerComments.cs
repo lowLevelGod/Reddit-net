@@ -26,7 +26,7 @@ namespace RedditNet.DataLayerFolder
         //{
         //    return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
         //}
-        public DatabaseComment? createComment(CommentNode node, Comment comment, String userId)
+        public DatabaseComment? createComment(CommentNode node, Comment comment, DatabaseUser user)
         {
             if (node.Parent != Constants.noParent)
             {
@@ -39,10 +39,8 @@ namespace RedditNet.DataLayerFolder
                     return null;
             }
 
-            DatabaseUser? user = new DataLayerUsers(db).readUser(userId);
             DatabaseMapper mapper = new DatabaseMapper();
             DatabaseComment c = mapper.toDBComment(node, comment, user);
-
             try
             {
                 db.Add<DatabaseComment>(c);

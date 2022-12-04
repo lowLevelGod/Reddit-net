@@ -19,13 +19,12 @@ namespace RedditNet.DataLayerFolder
         //{
         //    return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
         //}
-        public DatabasePost? createPost(Post post, string userId)
+        public DatabasePost? createPost(Post post, DatabaseUser user)
         {
             DataLayerComments d = new DataLayerComments(db);
-            DatabaseUser? user = new DataLayerUsers(db).readUser(userId);
-            if (d.createComment(post.Root, new Comment(post.Id, post.Root.Id, post.UserId, "root comment"), user.Id) != null)
+            if (d.createComment(post.Root, new Comment(post.Id, post.Root.Id, post.UserId, "root comment"), user) != null)
             {
-
+                Console.WriteLine("Root comment created");
                 DatabaseMapper mapper = new DatabaseMapper();
                 DatabasePost p = mapper.toDBPost(post, user);
 

@@ -8,7 +8,7 @@
     <h1>@Model.Title</h1>
     <h2><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})">@Model.SubName</a></h2>
     <p>Votes: <b>@Model.Votes</b></p>
-    <p>User id: <b>@Model.UserId</b></p>
+    <p>Posted by <a href="@Url.RouteUrl("ShowUser", new {userId = Model.UserId})">@Model.UserName</a></p>
     <p><b>@Model.Text</b></p>
    
     <a href="@Url.RouteUrl("EditPost", new {subId = Model.SubId, postId = Model.Id})">Edit</a>

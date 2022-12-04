@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using RedditNet.CommentFolder;
 using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
@@ -12,9 +14,17 @@ namespace RedditNet.Controllers
     {
         private DataLayerComments dbComments;
         private DataLayerUsers dbUsers;
-        public CommentsController(AppDbContext context)
+        private readonly UserManager<DatabaseUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public CommentsController(
+            AppDbContext context,
+            UserManager<DatabaseUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             dbComments = new DataLayerComments(context);
+            dbUsers = new DataLayerUsers(userManager, roleManager);
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         [HttpGet("{subId}/{postId}/comments/{commentId}")]
@@ -63,6 +73,7 @@ namespace RedditNet.Controllers
         }
 
 
+        [Authorize(Roles = "Regular, Moderator, Admin")]
         [HttpGet("{subId}/{postId}/comments/reply/{commentId}", Name = "CreateComment")]
 
         public IActionResult CreateForm(String subId, String postId, int commentId)
@@ -71,6 +82,7 @@ namespace RedditNet.Controllers
             cm.PostId = postId;
             cm.Parent = commentId;
             cm.SubId = subId;
+            cm.UserId = _userManager.GetUserId(User);
 
             return View("Create", cm);
         }
@@ -96,16 +108,20 @@ namespace RedditNet.Controllers
             return View("AllComments", result);
         }
 
-
+        [Authorize(Roles = "Regular, Moderator, Admin")]
         [HttpPost("{subId}/{postId}/comments/{commentId}")]
         public IActionResult Create(String subId, String postId, int commentId, CommentCreateModel c)
         {
+            DatabaseUser? user = dbUsers.readUser(_userManager.GetUserId(User));
+            if (user == null)
+                return BadRequest();
+
             CommentMapper mapper = new CommentMapper();
             Comment comment = mapper.createToComment(postId, c);
-            CommentNode n = new CommentNode(commentId);
+            CommentNode n = new CommentNode(0, commentId);
 
-            DatabaseComment? dbComment = dbComments.createComment(n, comment, c.UserId);
-
+            DatabaseComment? dbComment = dbComments.createComment(n, comment, user);
+            Console.WriteLine(dbComment.Text);
             if (dbComment != null)
                 return RedirectToRoute("ShowPostComments", new { subId = subId, postId = postId });
 

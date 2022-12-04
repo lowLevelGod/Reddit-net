@@ -5,7 +5,7 @@ namespace RedditNet.PostFolder
 {
     public class PostMapper
     {
-        public PostThreadModel toThreadModel(List<CommentThreadModel> comments, Post post, String subName)
+        public PostThreadModel toThreadModel(List<CommentThreadModel> comments, Post post, String subName, String userName)
         {
             PostThreadModel result = new PostThreadModel();
             result.Comments = comments;
@@ -16,6 +16,7 @@ namespace RedditNet.PostFolder
             result.Id = post.Id;
             result.SubId = post.SubId;
             result.SubName = subName;
+            result.UserName = userName;
 
             return result;
         }
