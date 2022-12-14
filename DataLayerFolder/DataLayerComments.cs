@@ -1,6 +1,5 @@
 ﻿
 using RedditNet.CommentFolder;
-using RedditNet.Migrations;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.PostFolder;

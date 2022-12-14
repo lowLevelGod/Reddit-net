@@ -7,16 +7,26 @@
 @{
 }
 
-<h1><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})">@Model.Title</a></h1>
+<div class="card">
+    <h1 class="card-header bg-primary"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-light">@Model.Title</a></h1>
+    <div class="card-body">
+        <form method="post" action="/@Model.SubId/posts/edit/@Model.Id">
+            @Html.Label("Votes", "Upvotes/Downvotes")
+            <br />
+            @Html.TextBox("Votes", Model.Votes, new { @class = "form-control" })
+            <br />
+            @Html.Label("Text", "Edit Content")
+            <br />
+           
+            @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
+            
+            @Html.ValidationMessage("Text", null, new { @class ="text-danger" })
+            <br />
+            <br />
+            <button class="btn btn-primary" type="submit">Edit Post</button>
+        </form>
+    </div>
+    
+</div>
 
-<form method="post" action="/@Model.SubId/posts/edit/@Model.Id">
-    @Html.Label("Votes", "Upvotes/Downvotes")
-    <br />
-    @Html.TextBox("Votes", Model.Votes, new { @class = "form-control" })
-    <br />
-    @Html.Label("Text", "Text here")
-    <br />
-    @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
-    <br />
-    <button type="submit">Edit Post</button>
-</form>
+

@@ -7,12 +7,22 @@
 @{
 }
 
-<h1><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.PostId})">Back to comments</a></h1>
+<div class="card">
+    <h1 class="card-header bg-gradient bg-secondary"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.PostId})" class="text-decoration-none link-light">Back to comments</a></h1>
+    <div class="card-body">
+        <form method="post" action="/@Model.SubId/@Model.PostId/comments/@Model.Parent">
+            @Html.Label("Text", "Add your comment here")
+            <br />
+            <br />
+            @Html.TextBox("Text", null, new { @class = "form-control" })
+           
+            @Html.ValidationMessage("Text", null, new { @class = "text-danger" })
+            <br />
+            <br />
+            <button class="btn btn-success" type="submit">Create Comment</button>
+        </form>
+    </div>
+    
+</div>
 
-<form method="post" action="/@Model.SubId/@Model.PostId/comments/@Model.Parent">
-    @Html.Label("Text", "Text here")
-    <br />
-    @Html.TextBox("Text", null, new { @class = "form-control" })
-    <br />
-    <button type="submit">Create Comment</button>
-</form>
+

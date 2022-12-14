@@ -7,8 +7,14 @@
 @{
 }
 
-<h1><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})">@Model.Title</a></h1>
 
-<form method="post" action="/@Model.SubId/posts/delete/@Model.Id">
-    <button type="submit">Delete Post</button>
-</form>
+    <h1 class="text-danger">Are you sure you want to delete <a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-danger">@Model.Title </a>?</h1>
+
+    <form method="post" action="/@Model.SubId/posts/delete/@Model.Id">
+        <button class="btn btn-danger" type="submit">Delete Post</button>
+    <button class="btn btn-light" type="button">
+        <a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" 
+        class="text-decoration-none ">Go back to post </a></button>
+    </form>
+
+

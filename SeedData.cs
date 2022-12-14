@@ -50,11 +50,11 @@ namespace RedditNet
                 {
                     Id = hash.sha256_hash("admin"),
                     // primary key
-                    UserName = "admin",
+                    UserName = "admin@test.com",
                     EmailConfirmed = true,
                     NormalizedEmail = "ADMIN@TEST.COM",
                     Email = "admin@test.com",
-                    NormalizedUserName = "ADMIN",
+                    NormalizedUserName = "ADMIN@TEST.COM",
                     PasswordHash = hasher.HashPassword(null, "Admin1!")
                 },
                 new DatabaseUser
@@ -62,22 +62,22 @@ namespace RedditNet
 
                     Id = hash.sha256_hash("moderator"),
                     // primary key
-                    UserName = "moderator",
+                    UserName = "moderator@test.com",
                     EmailConfirmed = true,
                     NormalizedEmail = "MODERATOR@TEST.COM",
                     Email = "moderator@test.com",
-                    NormalizedUserName = "MODERATOR",
+                    NormalizedUserName = "MODERATOR@TEST.COM",
                     PasswordHash = hasher.HashPassword(null, "Moderator1!")
                 },
                 new DatabaseUser
                 {
                     Id = hash.sha256_hash("regular"),
                     // primary key
-                    UserName = "regular",
+                    UserName = "regular@test.com",
                     EmailConfirmed = true,
                     NormalizedEmail = "REGULAR@TEST.COM",
                     Email = "regular@test.com",
-                    NormalizedUserName = "REGULAR",
+                    NormalizedUserName = "REGULAR@TEST.COM",
                     PasswordHash = hasher.HashPassword(null,"Regular1!")
                 }
                 );

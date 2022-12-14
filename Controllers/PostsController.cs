@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using RedditNet.CommentFolder;
 using RedditNet.DataLayerFolder;
-using RedditNet.Migrations;
+
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
@@ -11,12 +12,14 @@ using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
 using RedditNet.UtilityFolder;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
 
 namespace RedditNet.Controllers
 {
+    [Authorize]
     public class PostsController : Controller
     {
         private DataLayerPosts dbPosts;
@@ -39,10 +42,13 @@ namespace RedditNet.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
+
         //TODO
         //Use [deleted] for posts with deleted user
         //Add edit for admins
         //Introduce tokens for authentication
+
+        
         public IActionResult Index()
         {
             return View();
@@ -118,7 +124,7 @@ namespace RedditNet.Controllers
 
             return null;
         }
-
+        [Authorize(Roles = "Regular,Moderator,Admin")]
         [HttpGet("{subId}/posts/{postId}/comments/{sortType?}", Name = "ShowPostComments")]
         public IActionResult Show(String subId, String postId, int? sortType)
         {
@@ -132,15 +138,22 @@ namespace RedditNet.Controllers
             {
                 DatabaseMapper mapper = new DatabaseMapper();
                 DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
-                Console.WriteLine(dbc.Text);
+                
+                
                 if (dbc != null)
                 {
+                    Console.WriteLine(dbc.Text);
                     comments.Add(mapper.toThreadComment(dbc, subId));
                 }
             }
 
             DatabasePost? dbPost = dbPosts.readPost(subId, postId);
-
+            
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"];
+            }
+            
             if (dbPost != null)
             {
                 PostMapper pmapper = new PostMapper();
@@ -157,26 +170,105 @@ namespace RedditNet.Controllers
                 ViewBag.ByVotesAsc = Constants.comparisonByVotesAsc;
                 ViewBag.ByVotesDesc = Constants.comparisonByVotesDesc;
 
+                SetAccessRights();
+                
                 return View("Show", result);
             }
 
             return View("Error");
         }
 
+        //
+        private void SetAccessRights()
+        {
+            
+            ViewBag.AfisareButoane = false;
+            if (User.IsInRole("Moderator")||User.IsInRole("Regular"))
+            {
+                ViewBag.AfisareButoane = true;
+            }
+            ViewBag.UserCurent = _userManager.GetUserId(User);
+            ViewBag.EsteAdmin = User.IsInRole("Admin");
+            ViewBag.EsteModerator = User.IsInRole("Moderator");
+            
+        }
+        //
+
+        [Authorize(Roles = "Regular,Moderator,Admin")]
         [HttpPost("{subId}/posts/edit/{postId}")]
         public IActionResult Edit(String subId, String postId, PostUpdateModel p)
         {
+            
             DatabasePost? dbPost = dbPosts.updatePost(subId, postId, p);
-            if (dbPost != null)
+
+            if (dbPost != null && p.Text != null)
+            {
+                if (_userManager.GetUserId(User)==dbPost.User.Id || User.IsInRole("Admin"))
+                {
+                    TempData["message"] = "Your post has been modified";
+
+                    return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
+                }
+                else
+                {
+                    TempData["message"] = "You can't edit a post that is not yours";
+                    return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
+                }
+                
+            }
+
+            else
+            {
+                PostUpdateModel pm = new PostUpdateModel();
+                
+                pm.SubId =subId;
+                pm.UserId = _userManager.GetUserId(User);
+                pm.Id = postId;
+                pm.Title = p.Title;
+               
+                return View(pm);
+            }    
+
+
+            /*var dbPost = await dbPosts.UpdatePost(subId, postId,p);
+
+            if(p.Text==null)
+            {
+                //mesaj validare care va fi afisat in show
+                TempData["message"] = "Your post cannot be changed";
+                //
                 return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
+                
+            }
 
-            return BadRequest();
+            //mesaj validare care va fi afisat in show
+            TempData["message"] = "Your post has been modified";
+            //
+            return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });*/
+
+            /*DatabasePost? dbPost = dbPosts.updatePost(subId, postId, p);
+            
+            if (dbPost == null|| p.Text == null)
+            {
+                return View(p);
+            }
+            
+            //mesaj validare care va fi afisat in show
+            TempData["message"] = "Your post has been modified";
+            //
+            return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });*/
+
+
+
         }
-
+        [Authorize(Roles ="Regular,Moderator,Admin")]
         [HttpGet("{subId}/posts/edit/{postId}", Name = "EditPost")]
         public IActionResult EditForm(String subId, String postId)
         {
             DatabasePost? post = dbPosts.readPost(subId, postId);
+            DatabaseUser? user = dbUsers.readUser(_userManager.GetUserId(User));
+
+
             if (post != null)
             {
                 PostUpdateModel pm = new PostUpdateModel();
@@ -186,13 +278,24 @@ namespace RedditNet.Controllers
                 pm.Votes = post.Votes;
                 pm.Id = post.Id;
                 pm.Title = post.Title;
+                
+                if (pm.UserId==_userManager.GetUserId(User)|| User.IsInRole("Admin"))
+                {
+                    
+                    return View("Edit", pm);
+                }
+                else
+                {
+                    TempData["message"] = "You can't edit a post that is not yours";
+                    return RedirectToAction("Show", new { subId = pm.SubId, postId = pm.Id });
+                }
 
-                return View("Edit", pm);
+                
             }
             return View("Error");
         }
 
-        [Authorize(Roles = "Regular, Moderator, Admin")]
+        [Authorize(Roles = "Regular,Moderator,Admin")]
         [HttpPost("{subId}/posts/create")]
         public IActionResult Create(PostCreateModel p)
         {
@@ -204,12 +307,20 @@ namespace RedditNet.Controllers
             DatabasePost? dbPost = dbPosts.createPost(post, user);
             if (dbPost != null)
             {
+                //mesaj validare care va fi afisat in show
+                TempData["message"] = "Your post has been added";
+                //
                 return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
             }
-            return BadRequest();
+            else
+            {
+                return View(p);
+            }
+
+            
         }
 
-        [Authorize(Roles = "Regular, Moderator, Admin")]
+        [Authorize(Roles = "Regular,Moderator,Admin")]
         [HttpGet("{subId}/posts/create")]
         public IActionResult CreateForm(String subId)
         {
@@ -222,14 +333,31 @@ namespace RedditNet.Controllers
             return View("Create", cm);
         }
 
+        [Authorize(Roles ="Regular,Moderator,Admin")]
         [HttpPost("{subId}/posts/delete/{postId}")]
         public IActionResult Delete(String subId, String postId, PostDeleteModel p)
         {
-            if (dbPosts.deletePost(subId, postId, p) == true)
-                return Ok();
-            return BadRequest();
+            DatabasePost? post = dbPosts.readPost(subId, postId);
+            if (post.User.Id == _userManager.GetUserId(User) || User.IsInRole("Admin")|| User.IsInRole("Moderator"))
+            {
+                if (dbPosts.deletePost(subId, postId, p) == true)
+                {
+                    TempData["message"] = "The post has been deleted";
+
+                    return Redirect("/subs/" + subId + "/posts/0");
+                }
+                return BadRequest();
+            }
+            else
+            {
+                TempData["message"] = "You can't delete a post that is not yours";
+
+                return Redirect("/subs/" + subId + "/posts/0");
+            }
+                
         }
 
+        [Authorize(Roles = "Regular,Moderator,Admin")]
         [HttpGet("{subId}/posts/delete/{postId}", Name = "DeletePost")]
         public IActionResult DeleteForm(String subId, String postId, PostDeleteModel p)
         {
@@ -242,7 +370,14 @@ namespace RedditNet.Controllers
                 pm.Id = post.Id;
                 pm.Title = post.Title;
 
-                return View("Delete", pm);
+                if (pm.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")|| User.IsInRole("Moderator"))
+                    return View("Delete", pm);
+                else
+                {
+                    TempData["message"] = "You can't delete a post that is not yours";
+                    return Redirect("/subs/" + subId + "/posts/0");
+                }
+                
             }
 
             return View("Error");

@@ -7,16 +7,27 @@
 @{
 }
 
-<h1><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})">Back to posts</a></h1>
+<h1><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})" class="text-decoration-none link-secondary">Back to posts</a></h1>
 
 <form method="post" action="/@Model.SubId/posts/create">
-    @Html.Label("Title", "Title here")
-    <br />
-    @Html.TextBox("Title", Model.Title, new { @class = "form-control" })
-    <br />
-    @Html.Label("Text", "Text here")
-    <br />
-    @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
-    <br />
-    <button type="submit">Create Post</button>
+    <div class="card">
+        <div class="card-body">
+            @*@Html.ValidationSummary(false, "", new { @class = "text-danger" })*@
+            <h3>@Html.Label("Title", "Add your title here")</h3>
+            <br />
+            @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+            <br />
+            @Html.TextBox("Title", Model.Title, new { @class = "form-control" })
+            <br />
+            <p>@Html.Label("Text", "Add your text here")</p>
+            <br />
+            @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger" })
+            <br />
+            @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
+            
+            <br />
+            <button type="submit" class="btn btn-primary">Create Post</button>
+        </div>
+        
+    </div>
 </form>

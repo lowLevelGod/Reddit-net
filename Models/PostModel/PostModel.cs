@@ -1,4 +1,7 @@
-﻿namespace RedditNet.Models.PostModel
+﻿
+using System.ComponentModel.DataAnnotations;
+
+namespace RedditNet.Models.PostModel
 {
     public class PostModel
     {
@@ -7,6 +10,8 @@
         public String SubId { get; set; }
 
         public String Id { get; set; }
+
+        [Required(ErrorMessage = "You must add the tile")]
         public String Title { get; set; }
     }
 }

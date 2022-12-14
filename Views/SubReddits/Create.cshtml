@@ -6,15 +6,47 @@
 *@
 @{
 }
+@*@{
+    ViewBag.Title = "Create SubReddit";
+}*@
+<div class="card bg-light mb-3" >
+    <h2 class="card-header">Create SubReddit</h2>
+    <br />
 
-<form method="post" action="/subs/create">
-    @Html.Label("Name", "Name here")
+    @using (Html.BeginForm(actionName: "create", controllerName: "SubReddits", method: FormMethod.Post))
+    {
+        
+        <div class="card-body">
+
+            <div class="card-title">@Html.Label("Name", "SubReddit name")</div>
+            
+            @Html.TextBox("Name", Model.Name, new { @class = "form-control" })
+            <br />
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+            <br>
+            @Html.Label("Description", "Description")
+            <br />
+            @Html.TextBox("Description", Model.Description, new { @class = "form-control" })
+            <br />
+            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            <br>
+            <button class="btn btn-success" type="submit">Create SubReddit</button>
+
+        </div>
+    }
+</div>
+
+
+
+
+@*<form method="post" action="/subs/create">
+    @Html.Label("Name", "SubReddit name")
     <br />
     @Html.TextBox("Name", Model.Name, new { @class = "form-control" })
     <br /><br />
-    @Html.Label("Description", "Description here")
+    @Html.Label("Description", "Description")
     <br />
     @Html.TextBox("Description", Model.Description, new { @class = "form-control" })
     <br /><br />
     <button type="submit">Create SubReddit</button>
-</form>
+</form>*@

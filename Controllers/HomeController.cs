@@ -27,6 +27,10 @@ namespace RedditNet.Controllers
             List<SubRedditPreviewModel>? result = dbSubs.getSubs();
             if (result != null)
             {
+                if (TempData.ContainsKey("message"))
+                {
+                    ViewBag.message = TempData["message"].ToString();
+                }
                 return View(result);
             }
             return View("Error");

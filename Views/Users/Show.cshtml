@@ -5,18 +5,31 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    <h1>@Model.UserName's Profile</h1>
-    <p>Email: <b>@Model.Email</b></p>
-    <p>Description: <b>@Model.Description</b></p>
-    <p>Role: <b>@Model.Role</b></p>
+    
 
-    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
-        <button type="submit">Change to Regular</button>
-    </form>
-    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Moderator"})">
-        <button type="submit">Change to Moderator</button>
-    </form>
-    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Admin"})">
-        <button type="submit">Change to Admin</button>
-    </form>
+    <div class="card">
+        <h1 class="card-header bg-secondary bg-gradient text-light">Your Profile</h1>
+        <br />
+        <div class="card-body">
+            <h2 class="">@Model.UserName's </h2>
+            <p>Email: <b>@Model.Email</b></p>
+            <p>Description: <b>@Model.Description</b></p>
+            <p>Role: <b>@Model.Role</b></p>
+
+            <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
+                <button class="btn btn-secondary" type="submit">Change to Regular</button>
+            </form>
+            <br>
+            <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Moderator"})">
+                <button class="btn btn-secondary"type="submit">Change to Moderator</button>
+            </form>
+            <br>
+            <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Admin"})">
+                <button class="btn btn-secondary" type="submit">Change to Admin</button>
+            </form>
+        </div>
+        
+    </div>
+
+    
 }

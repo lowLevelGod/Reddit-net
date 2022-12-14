@@ -1,4 +1,5 @@
-﻿using RedditNet.CommentFolder;
+﻿using Microsoft.EntityFrameworkCore;
+using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
@@ -87,7 +88,7 @@ namespace RedditNet.DataLayerFolder
             {
                 try
                 {
-                    dbp.Text = p.Text;
+                    dbp.Text = p.Text ;
                     dbp.Votes = p.Votes;
                     db.SaveChanges();
 
@@ -118,6 +119,38 @@ namespace RedditNet.DataLayerFolder
             }
 
         }
+
+
+
+        //
+        /*public async Task<DatabasePost> ReadPost(string subId, string id)
+        {
+            var post = await db.Posts.FirstOrDefaultAsync(x=>x.Id == id &&x.SubId==subId);
+
+            return post is null ? new DatabasePost { } : post;
+
+        }*/
+        //
+
+        //
+        /*public async Task<DatabasePost> UpdatePost(string subId, string id, PostUpdateModel p)
+        {
+            var editPost=await ReadPost(subId, id);
+
+            if(editPost != null)
+            {
+                editPost.Text = string.IsNullOrEmpty(p.Text) ? editPost.Text : p.Text;
+                editPost.Votes = p.Votes;
+
+                await db.SaveChangesAsync() ;
+
+                return editPost;
+            }
+
+            return new();
+        }*/
+
+        //
 
         //public void removePost(string subId, string id)
         //{

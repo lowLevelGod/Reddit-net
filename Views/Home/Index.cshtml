@@ -5,20 +5,50 @@
 @{
     ViewData["Title"] = "RedditNet";
 }
-
+<br />
+<br />
+@if (ViewBag.Message != null)
+{
+    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+}
 <div class="text-center">
-    <h1 class="display-4">Welcome to RedditNet</h1>
-    <p> <a href="/subs/create">Create a new SubReddit</a>.</p>
-    <h1>Existing SubReddits below! </h1>
-
-    @{
-        foreach (var s in Model)
-        {
-            <p>
-                <a href="/subs/@s.Id/posts/0">@s.Name</a>
-            <br />
-            @s.Description
-            </p>
-        }
+    <div class="alert alert-info">
+        <br />
+        <h1 class="display-4 alert alert-info">Welcome to RedditNet</h1>
+        <br />
+    </div>
+    
+    <br />
+    @if(User.IsInRole("Admin"))
+    {
+        <button type="button" class="btn btn-info"> <a href="/subs/create" class="text-decoration-none link-light">Create a new SubReddit</a></button>
     }
+   
+    <br />
+    <br />
+    <br />
+    <h2 >Explore SubReddits down below </h2>
+    <div class="card ">
+        
+        <div class="container">
+            @{
+                foreach (var s in Model)
+                {
+                    <div class="row ">
+                        <h5 class="col-sm bg-info bg-gradient"><a href="/subs/@s.Id/posts/0" class="text-decoration-none link-light">@s.Name</a></h5>
+                        <br />
+                        
+                        <p class="card-body">@s.Description</p>
+                    </div>
+
+
+
+                }
+            }
+        </div>
+        
+    </div>
+    
+
+    
 </div>

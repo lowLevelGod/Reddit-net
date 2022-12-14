@@ -13,9 +13,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     .UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+
+
+//useri si roluri
 builder.Services.AddDefaultIdentity<DatabaseUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+//
+
+
 
 builder.Services.AddControllersWithViews();
 

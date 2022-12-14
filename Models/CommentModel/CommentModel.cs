@@ -1,4 +1,6 @@
-﻿namespace RedditNet.Models.CommentModel
+﻿using RedditNet.Models.DatabaseModel;
+
+namespace RedditNet.Models.CommentModel
 {
     public class CommentModel
     {
@@ -9,5 +11,7 @@
         public String PostId { get; set; }
 
         public String SubId { get; set; }
+
+        
     }
 }
