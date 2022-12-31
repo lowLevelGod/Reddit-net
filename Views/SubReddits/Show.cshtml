@@ -71,8 +71,12 @@
     </a>
 }
 
+@if (ViewBag.Page < ViewBag.MaxPage)
+{
+
     <a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.Id, start = ViewBag.Page + 1})"
    class="btn btn-secondary">
         Next &raquo;
     </a>
+}
 

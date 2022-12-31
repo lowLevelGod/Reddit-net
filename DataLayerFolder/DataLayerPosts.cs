@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RedditNet.CommentFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
@@ -6,6 +7,7 @@ using RedditNet.Models.PostModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
+using RedditNet.UtilityFolder;
 
 namespace RedditNet.DataLayerFolder
 {
@@ -16,6 +18,43 @@ namespace RedditNet.DataLayerFolder
         {
             this.db = db;
         }
+
+        public (List<PostPreviewModel>?, int) getPosts(String search = "", int start = 0)
+        {
+            if (search != "")
+            {
+                try
+                {
+                    var dbp = (from b in db.Posts
+                               where (b.Text.Contains(search)) || (b.Title.Contains(search))
+                               select b).Include("User").OrderBy(o => o.Id);
+
+                    List<DatabasePost>? posts = dbp.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabasePost>();
+
+                    int cnt = dbp.Count();
+
+                    List<PostPreviewModel>? result = new List<PostPreviewModel>();
+
+                    DatabaseMapper mapper = new DatabaseMapper();
+                    foreach (DatabasePost p in posts)
+                    {
+                        PostMapper pm = new PostMapper();
+                        result.Add(pm.toPreviewModel(p.User.UserName,
+                            mapper.toPost(p)));
+                    }
+
+                    return (result, cnt);
+
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return (null, 0);
+        }
+
         //private bool hasPermission(User affectedUser, User requestingUser)
         //{
         //    return (affectedUser?.isSame(requestingUser) ?? false) || requestingUser.isAdmin() || requestingUser.isMod();
@@ -25,7 +64,6 @@ namespace RedditNet.DataLayerFolder
             DataLayerComments d = new DataLayerComments(db);
             if (d.createComment(post.Root, new Comment(post.Id, post.Root.Id, post.UserId, "root comment"), user) != null)
             {
-                Console.WriteLine("Root comment created");
                 DatabaseMapper mapper = new DatabaseMapper();
                 DatabasePost p = mapper.toDBPost(post, user);
 

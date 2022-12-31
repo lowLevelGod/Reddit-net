@@ -120,14 +120,18 @@ namespace RedditNet.DataLayerFolder
             return null;
         }
 
-        public List<PostPreviewModel>? getPosts(String id, int start)
+        public (List<PostPreviewModel>?, int) getPosts(String id, int start)
         {
             List<PostPreviewModel> result = new List<PostPreviewModel>();
-            List<DatabasePost>? dbPosts = (from b in db.Posts
-                                             where (b.SubId == id)
-                                             select b).OrderBy(o => o.Id).Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabasePost>();
+            var posts = (from b in db.Posts
+                         where (b.SubId == id)
+                         select b).OrderBy(o => o.Id);
+
+            int cnt = posts.Count();
+            List<DatabasePost>? dbPosts = posts.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabasePost>();
+
             if (dbPosts == null)
-                return null;
+                return (null, 0);
 
             PostMapper mapper = new PostMapper();
             DatabaseMapper dmapper = new DatabaseMapper();
@@ -139,17 +143,34 @@ namespace RedditNet.DataLayerFolder
                 result.Add(pm);
             }
 
-            return result;
+            return (result, cnt);
         }
 
-        public List<SubRedditPreviewModel>? getSubs()
+        public (List<SubRedditPreviewModel>?, int) getSubs(String search = "", int start = 0)
         {
             List<SubRedditPreviewModel> result = new List<SubRedditPreviewModel>();
-            List<DatabaseSubReddit>? dbSubs = (from b in db.SubReddits
-                                               where (1 == 1)
-                                           select b).ToList<DatabaseSubReddit>();
+            List<DatabaseSubReddit>? dbSubs = null;
+
+            int cnt = 0;
+            if (search == "")
+            {
+                dbSubs = (from b in db.SubReddits
+                                                   where (1 == 1)
+                                                   select b).ToList<DatabaseSubReddit>();
+                cnt = dbSubs.Count();
+            }else
+            {
+                var ds = (from b in db.SubReddits
+                          where (1 == 1) && (b.Description.Contains(search)) || (b.Name.Contains(search))
+                          select b).OrderBy(o => o.Id);
+
+                dbSubs = ds.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabaseSubReddit>();
+                cnt = ds.Count();
+            }
+
+
             if (dbSubs == null)
-                return null;
+                return (null, 0);
 
             SubRedditMapper mapper = new SubRedditMapper();
             DatabaseMapper dmapper = new DatabaseMapper();
@@ -161,7 +182,7 @@ namespace RedditNet.DataLayerFolder
                 result.Add(pm);
             }
 
-            return result;
+            return (result, cnt);
         }
     }
 }

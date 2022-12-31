@@ -8,6 +8,7 @@ using RedditNet.Models.PostModel;
 using RedditNet.Models.SubRedditModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
+using RedditNet.UtilityFolder;
 
 namespace RedditNet.Controllers
 {
@@ -43,7 +44,7 @@ namespace RedditNet.Controllers
             DatabaseSubReddit? s = dbSubs.readSubReddit(subId);
             if (s != null)
             {
-                List<PostPreviewModel>? pm = dbSubs.getPosts(subId, start);
+                (List<PostPreviewModel>? pm, int cnt) = dbSubs.getPosts(subId, start);
                 if (pm != null)
                 {
 
@@ -60,7 +61,7 @@ namespace RedditNet.Controllers
                     SubRedditPostsModel result = mapper.toPostsModel(pm, sub);
 
                     ViewBag.Page = start;
-
+                    ViewBag.MaxPage = Math.Ceiling((float)cnt /(float)Constants.pageSizePosts) - 1;
 
 
                     return View("Show", result);

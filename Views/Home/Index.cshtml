@@ -6,6 +6,18 @@
     ViewData["Title"] = "RedditNet";
 }
 
+<form method="GET" action="/search/0/sr">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control"
+               placeholder="Search topics or keywords" name="search"
+               value="@ViewBag.SearchString">
+        <button class="btn btn-outline-success"
+                type="submit">
+            Search
+        </button>
+    </div>
+</form>
+
 @if (ViewBag.Message != null)
 {
     <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>

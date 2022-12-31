@@ -13,6 +13,7 @@ namespace RedditNet.CommentFolder
             result.Depth = depth;
             result.Votes = c.Votes;
             result.SubId = subId;
+            result.PostId = c.PostId;
 
             return result;
         }

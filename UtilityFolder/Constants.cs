@@ -16,5 +16,10 @@
         public const int comparisonByVotesDesc = 3;
 
         public const int pageSizePosts = 5;
+
+        public const String subType = "sr";
+        public const String comType = "comments";
+        public const String postType = "posts";
+        public const String userType = "users";
     }
 }

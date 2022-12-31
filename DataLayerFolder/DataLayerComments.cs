@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data.Common;
+using System.Security.Cryptography.Pkcs;
 
 namespace RedditNet.DataLayerFolder
 {
@@ -19,7 +20,55 @@ namespace RedditNet.DataLayerFolder
         public DataLayerComments(AppDbContext db)
         {
             this.db = db;
-        }   
+        }
+        
+        public (List<CommentThreadModel>?, int) getComments(String search, int start)
+        {
+            if (search != "")
+            {
+                try
+                {
+                    var dbc = (from b in db.Comments
+                               where ((b.Text.Contains(search) && (b.Parent != -1)))
+                               select b).OrderBy(o => o.Id);
+
+                    List<DatabaseComment>? dbComments = dbc.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabaseComment>();
+                    int cnt = dbc.Count();
+
+                    List<CommentThreadModel> result = new List<CommentThreadModel>();
+                    DatabaseMapper mapper = new DatabaseMapper();
+
+                    foreach (var x in dbComments)
+                    {
+                        String? subId = null;
+                        try
+                        {
+                            var post = (from b in db.Posts
+                                        where (b.Id == x.PostId)
+                                        select b).FirstOrDefault();
+                            if (post != null)
+                                subId = post.SubId;
+                        }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
+
+                        if (subId != null)
+                        {
+                            result.Add(mapper.toThreadComment(x, subId));
+                        }
+                    }
+                    return (result, cnt);
+                }
+                catch (Exception)
+                {
+                    return (null, 0);
+                }
+            }
+
+            return (null, 0);
+        }
 
         //private bool hasPermission(User affectedUser, User requestingUser)
         //{

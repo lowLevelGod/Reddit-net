@@ -25,8 +25,6 @@ namespace RedditNet.Models.DatabaseModel
         public CommentThreadModel toThreadComment(DatabaseComment c, String subId)
         {
             CommentMapper mapper = new CommentMapper();
-            Console.WriteLine(c.User);
-            Console.WriteLine(c.User.Id);
             Comment comment = new Comment(c.PostId, c.Id, c.User.Id, c.Text, c.Votes);
 
             return mapper.toThreadModel(comment, subId, c.Depth);

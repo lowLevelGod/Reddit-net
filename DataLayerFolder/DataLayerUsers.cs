@@ -2,6 +2,7 @@
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.UserModel;
 using RedditNet.UserFolder;
+using RedditNet.UtilityFolder;
 
 namespace RedditNet.DataLayerFolder
 {
@@ -43,6 +44,40 @@ namespace RedditNet.DataLayerFolder
             {
                 return null;
             }
+        }
+
+        public (List<UserShowModel>?, int) getUsers(String search, int start = 0)
+        {
+            if (search != "")
+            {
+                try
+                {
+                    var dbu = (from b in _userManager.Users
+                               where (b.UserName.Contains(search))
+                               select b).OrderBy(o => o.Id);
+                    List<DatabaseUser>? users = dbu.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList();
+
+                    int cnt = dbu.Count();
+
+                    List<UserShowModel>? result = new List<UserShowModel>();
+                    foreach (var u in users)
+                    {
+                        UserShowModel usm = new UserShowModel();
+                        usm.UserName = u.UserName;
+                        usm.Id = u.Id;
+
+                        result.Add(usm);
+                    }
+
+                    return (result, cnt);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return (null, 0);
         }
 
         //public void updateUser(String id, UserUpdateModel u)
