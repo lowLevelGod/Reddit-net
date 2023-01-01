@@ -39,7 +39,7 @@ namespace RedditNet.Controllers
 
             _logger = logger;
         }
-        
+
         public IActionResult Index()
         {
             (List<SubRedditPreviewModel>? result, int cnt) = dbSubs.getSubs();

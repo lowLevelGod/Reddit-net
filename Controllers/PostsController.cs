@@ -69,7 +69,6 @@ namespace RedditNet.Controllers
                 DatabaseMapper mapper = new DatabaseMapper();
                 DatabaseComment? dbc = dbComments.readComment(postId, n.Id);
                 
-                
                 if (dbc != null)
                 {
                     comments.Add(mapper.toThreadComment(dbc, subId));

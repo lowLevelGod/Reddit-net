@@ -112,8 +112,8 @@ namespace RedditNet.Controllers
         public IActionResult Create(SubRedditCreateModel m)
         {
             SubRedditMapper mapper = new SubRedditMapper();
-            
-            
+
+            Console.WriteLine(m);
             if (m.Name != null&&m.Description!=null)
             {
                 SubReddit s = mapper.createModelToSubReddit(m);

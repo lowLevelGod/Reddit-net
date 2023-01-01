@@ -5,5 +5,6 @@
         public String Text { get; set; }
         public int Depth { get; set; }
         public int? Votes { get; set; }
+        public String UserName { get; set; }
     }
 }

@@ -104,6 +104,11 @@ footer {
     flex-grow: 1;
 }
 
+.searchBar {
+    background-color: #a0d2eb;
+    border: none;
+}
+
 /*.navbar {
     background-color: #dfe6e9 !important;
     border: none !important;

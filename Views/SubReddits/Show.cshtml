@@ -12,7 +12,7 @@
 @{
 
 
-    
+
     <h1><a href='@Url.ActionLink("Index", "Home")' class="link-secondary text-decoration-none">Back to Home Page</a></h1>
     var posts = Model.Posts;
     <br />
@@ -21,7 +21,7 @@
         <div class="card-body">
             <p class="card-text">Description: @Model.Description</p>
 
-            @if(User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin"))
             {
                 <button type="button" class="btn btn-light"><i class="bi bi-pencil-fill"></i><a href="@Url.RouteUrl("EditSub", new {subId = Model.Id})" class="link-secondary text-decoration-none">Edit</a></button>
 
@@ -29,36 +29,39 @@
                 <br>
                 <br>
             }
-            
-            
+
+
             <button type="button" class="btn btn-secondary"> <a href="/@Model.Id/posts/create" class="text-decoration-none link-light">Create a new Post</a></button>
         </div>
-        
+
     </div>
 
 
 
     <div class="card">
-    <h2 class="card-header">Posts below</h2>
-    <div class="card-body">
+        <h2 class="card-header">Posts below</h2>
+        <div class="card-body">
             @foreach (var p in posts)
             {
                 <div class="card">
                     <h1 class="card-header"><a href="/@Model.Id/posts/@p.Id/comments" class="text-decoration-none link-dark">@p.Title</a></h1>
 
                     <div class="card-body">
-                        <p class="card-text">Posted by: <i class="bi bi-person"></i>@p.UserName</p>
+                        <p class="card-text">
+                            Posted by: <i class="bi bi-person"></i>
+                            <a href="@Url.RouteUrl("ShowUser", new {userId = p.UserId})">@p.UserName</a>
+                        </p>
                         <p class="card-text">Votes: @p.Votes</p>
                     </div>
 
 
                 </div>
             }
-    </div>    
-        
-        
+        </div>
+
+
     </div>
-    
+
 
 }
 

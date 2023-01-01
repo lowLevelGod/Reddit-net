@@ -27,7 +27,7 @@ namespace RedditNet.Models.DatabaseModel
             CommentMapper mapper = new CommentMapper();
             Comment comment = new Comment(c.PostId, c.Id, c.User.Id, c.Text, c.Votes);
 
-            return mapper.toThreadModel(comment, subId, c.Depth);
+            return mapper.toThreadModel(comment, subId, c.Depth, c.User.UserName);
         }
 
         public DatabasePost toDBPost(Post p, DatabaseUser user)

@@ -139,7 +139,22 @@ namespace RedditNet.DataLayerFolder
             {
                 //String userName = DatabaseInterface.dataLayerUsers.readUser(p.UserId).UserName;
                 Post post = dmapper.toPost(x);
-                PostPreviewModel pm = mapper.toPreviewModel("user name here", post);
+                DatabaseUser? u = null;
+                try
+                {
+                    u = (from b in db.Users where post.UserId == b.Id select b).FirstOrDefault();
+                }catch(Exception)
+                {
+
+                }
+
+                String userName = "user name here";
+                if (u != null)
+                {
+                    userName = u.UserName;
+                }
+
+                PostPreviewModel pm = mapper.toPreviewModel(userName, post);
                 result.Add(pm);
             }
 
