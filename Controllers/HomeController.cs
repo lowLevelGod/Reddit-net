@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography.Xml;
-using static Humanizer.On;
 
 namespace RedditNet.Controllers
 {

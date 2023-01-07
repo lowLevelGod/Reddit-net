@@ -28,7 +28,8 @@ namespace RedditNet.UserFolder
             result.UserName = u.UserName;
             result.Role = role;
             result.Email = u.Email;
-            //result.Description = u.Description;
+            result.Description = u.Description;
+            result.ProfilePic = u.ProfilePic;
 
             return result;
         }

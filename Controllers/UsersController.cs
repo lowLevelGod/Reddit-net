@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RedditNet.DataLayerFolder;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.UserModel;
@@ -15,86 +16,131 @@ namespace RedditNet.Controllers
         private DataLayerUsers dbUsers;
         private readonly UserManager<DatabaseUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AppDbContext _context;
+        private IWebHostEnvironment _env;
         public UsersController(
             AppDbContext context,
             UserManager<DatabaseUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IWebHostEnvironment
+            env)
         {
+            _context = context;
             dbComments = new DataLayerComments(context);
             dbUsers = new DataLayerUsers(userManager, roleManager);
             _userManager = userManager;
             _roleManager = roleManager;
+            _env = env;
         }
 
-        [HttpGet("users/{userId}", Name = "ShowUser")]
-        public IActionResult Show(String userId)
+        public async Task<IActionResult> UploadProfilePic(IFormFile profilePic)
         {
-            DatabaseUser? u = dbUsers.readUser(userId);
-            if (u != null)
+            if (profilePic != null && profilePic.Length > 0)
             {
-                UserMapper mapper = new UserMapper();
-                UserShowModel result = mapper.toShowModel(
-                    u,
-                    _userManager.GetRolesAsync(u).Result.ElementAt(0)
-                    );
+                Console.WriteLine(profilePic.FileName);
+                Console.WriteLine(profilePic.Length);
+                Console.WriteLine(profilePic.Headers.ContentLength);
+                var storagePath = Path.Combine(
+                        _env.WebRootPath,
+                        "pictures",
+                        profilePic.FileName
+                        );
 
-                return View("Show", result);
+                var databaseFileName = "/pictures/" + profilePic.FileName;
+
+                using (var fileStream = new FileStream(storagePath,
+                                            FileMode.Create))
+                {
+                    await profilePic.CopyToAsync(fileStream);
+                }
+                
+                var user = _userManager.FindByEmailAsync(User.Identity.Name).Result;
+
+                user.ProfilePic = databaseFileName;
+                _context.SaveChanges();
             }
 
-            return View("Error");
-        }
-
-        //[Authorize(Roles = "Admin")]
-        [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
-        public IActionResult ChangeRole(String userId, String newRole)
-        {
-            //if (User.IsInRole("Admin"))
-            //{
-                DatabaseUser? user = dbUsers.readUser(userId);
-                String[] roles = new string[] { "Admin", "Regular", "Moderator" };
-                if (user != null)
-                {
-                List<String> currentRoles = (List<string>)_userManager.GetRolesAsync(user).Result;
-                _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-                if (!roles.Contains<String>(newRole))
-                    newRole = "Regular";
-
-                _userManager.AddToRoleAsync(user, newRole);
-                _userManager.UpdateSecurityStampAsync(user);
-
-
-
-                }   
-
-                return RedirectToRoute("ShowUser", new { userId = userId });
-            //}
-
-            return View("Error");
-        }
-
-        //[HttpPut("users/{userId}")]
-        //public IActionResult Edit(String userId, [FromBody] UserUpdateModel u)
-        //{
-        //    du.updateUser(userId, u);
-        //    return Ok();
-        //}
-
-        //[HttpPost("users")]
-        //public IActionResult Create([FromBody] UserCreateModel u)
-        //{
-        //    UserMapper mapper = new UserMapper();
-        //    User user = mapper.createModelToUser(u);
-
-        //    du.createUser(user);
-        //    return Ok();
-        //}
-
-        //[HttpDelete("users/{userId}")]
-        //public IActionResult Delete(String userId, [FromBody] UserDeleteModel u)
-        //{
-        //    du.deleteUser(userId, u);
-        //    return Ok();
-        //}
+            return Redirect("/Identity/Account/Manage");
     }
+
+    [HttpGet("users/{userId}", Name = "ShowUser")]
+    public IActionResult Show(String userId)
+    {
+        DatabaseUser? u = dbUsers.readUser(userId);
+        if (u != null)
+        {
+            UserMapper mapper = new UserMapper();
+            UserShowModel result = mapper.toShowModel(
+                u,
+                _userManager.GetRolesAsync(u).Result.ElementAt(0)
+                );
+
+            return View("Show", result);
+        }
+
+        return View("Error");
+    }
+
+    //[Authorize(Roles = "Admin")]
+    [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
+    public IActionResult ChangeRole(String userId, String newRole)
+    {
+        //if (User.IsInRole("Admin"))
+        //{
+        DatabaseUser? user = dbUsers.readUser(userId);
+        String[] roles = new string[] { "Admin", "Regular", "Moderator" };
+        if (user != null)
+        {
+            List<String> currentRoles = (List<string>)_userManager.GetRolesAsync(user).Result;
+            _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+            if (!roles.Contains<String>(newRole))
+                newRole = "Regular";
+
+            _userManager.AddToRoleAsync(user, newRole);
+            _userManager.UpdateSecurityStampAsync(user);
+
+
+
+        }
+
+        return RedirectToRoute("ShowUser", new { userId = userId });
+        //}
+
+        return View("Error");
+    }
+
+    [HttpPost("users/edit")]
+    public IActionResult Edit(UserUpdateModel m)
+    {
+        DatabaseUser? u = _userManager.FindByEmailAsync(User.Identity.Name).Result;
+
+        if (u == null)
+        {
+            return Redirect("/Identity/Account/Manage");
+        }
+
+        u.Description = m.Description;
+            _context.SaveChanges();
+
+        return Redirect("/Identity/Account/Manage");
+    }
+
+    //[HttpPost("users")]
+    //public IActionResult Create([FromBody] UserCreateModel u)
+    //{
+    //    UserMapper mapper = new UserMapper();
+    //    User user = mapper.createModelToUser(u);
+
+    //    du.createUser(user);
+    //    return Ok();
+    //}
+
+    //[HttpDelete("users/{userId}")]
+    //public IActionResult Delete(String userId, [FromBody] UserDeleteModel u)
+    //{
+    //    du.deleteUser(userId, u);
+    //    return Ok();
+    //}
+}
 }

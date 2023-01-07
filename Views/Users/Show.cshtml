@@ -8,12 +8,24 @@
     
 
     <div class="card">
-        <h1 class="card-header bg-secondary bg-gradient text-light">Your Profile</h1>
-        <br />
+
         <div class="card-body">
-            <h2 class="">@Model.UserName's </h2>
+            <h2 class="">@Model.UserName's Profile</h2>
+            @if (Model.ProfilePic != null)
+            {
+                <img src="@Model.ProfilePic" alt="poza profil">
+            }else
+            {
+                <img src="/pictures/defaultPic.svg" alt="poza profil">
+            }
             <p>Email: <b>@Model.Email</b></p>
-            <p>Description: <b>@Model.Description</b></p>
+            @if (Model.Description != null)
+            {
+                <p>About: <b>@Model.Description</b></p>
+            }else
+            {
+                <p>About: <b>Apparently, this user prefers to keep an air of mystery about them.</b></p>
+            }
             <p>Role: <b>@Model.Role</b></p>
 
             <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
