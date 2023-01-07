@@ -23,6 +23,7 @@
 
             @if (User.IsInRole("Admin"))
             {
+
                 <button type="button" class="btn btn-light"><i class="bi bi-pencil-fill"></i><a href="@Url.RouteUrl("EditSub", new {subId = Model.Id})" class="link-secondary text-decoration-none">Edit</a></button>
 
                 <button type="button" class="btn btn-danger"><i class="bi bi-trash"></i><a href="@Url.RouteUrl("DeleteSub", new {subId = Model.Id})" class="text-decoration-none link-light">Delete</a></button>

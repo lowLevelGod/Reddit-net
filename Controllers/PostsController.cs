@@ -8,6 +8,7 @@ using RedditNet.DataLayerFolder;
 using RedditNet.Models.CommentModel;
 using RedditNet.Models.DatabaseModel;
 using RedditNet.Models.PostModel;
+using RedditNet.Models.SubRedditModel;
 using RedditNet.PostFolder;
 using RedditNet.SubRedditFolder;
 using RedditNet.UserFolder;
@@ -308,6 +309,40 @@ namespace RedditNet.Controllers
                 
             }
 
+            return View("Error");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{subId}/{oldSubId}/posts/move/{postId}")]
+        public IActionResult Move(String subId, String oldSubId, String postId)
+        {
+            bool res = dbPosts.movePost(subId, oldSubId, postId);    
+            if (res == true)
+            {
+                TempData["message"] = "The post has been moved";
+                return RedirectToAction("Show", new { subId = subId, postId = postId });
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{subId}/posts/move/{postId}", Name = "MovePost")]
+        public IActionResult MoveForm(String subId, String postId)
+        {
+            (List<SubRedditPreviewModel>? result, int cnt) = dbSubs.getSubs();
+            if (result != null)
+            {
+                if (TempData.ContainsKey("message"))
+                {
+                    ViewBag.message = TempData["message"].ToString();
+                }
+
+                ViewBag.SubId = subId;
+                ViewBag.PostId = postId;
+                result.RemoveAll(r => r.Id == subId);
+                return View("Move", result);
+            }
             return View("Error");
         }
     }

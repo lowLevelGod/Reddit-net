@@ -19,6 +19,25 @@ namespace RedditNet.DataLayerFolder
             this.db = db;
         }
 
+        public bool movePost(String subId, String oldSubId, String postId)
+        {
+            DatabasePost? p = readPost(oldSubId, postId);
+            if (p != null)
+            {
+                try
+                {
+                    p.SubId = subId;
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
         public (List<PostPreviewModel>?, int) getPosts(String search = "", int start = 0)
         {
             if (search != "")
