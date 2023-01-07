@@ -29,7 +29,7 @@ namespace RedditNet.DataLayerFolder
                 try
                 {
                     var dbc = (from b in db.Comments
-                               where ((b.Text.Contains(search) && (b.Parent != -1)))
+                               where ((b.Text.Contains(search) && (b.Parent != -1) && b.Deleted == false))
                                select b).OrderBy(o => o.Id);
 
                     List<DatabaseComment>? dbComments = dbc.Skip(start * Constants.pageSizePosts).Take(Constants.pageSizePosts).ToList<DatabaseComment>();
@@ -108,7 +108,8 @@ namespace RedditNet.DataLayerFolder
             {
                 try
                 {
-                    db.Remove<DatabaseComment>(dbc);
+                    //db.Remove<DatabaseComment>(dbc);
+                    dbc.Deleted = true;
                     db.SaveChanges();
 
                     return true;

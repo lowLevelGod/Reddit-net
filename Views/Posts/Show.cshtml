@@ -76,26 +76,35 @@
                                 <a href="@Url.RouteUrl("ShowUser", new {userId = c.UserId})">@c.UserName</a>
                             </i>
                         </strong>
-                        <h6>@c.Text</h6>
+                            @if (c.Deleted == false)
+                            {
+                            <h6>@c.Text</h6>
+                            }
+                            else
+                            {
+                            <h6>[deleted]</h6>
+                            }
                         <p>Votes: @c.Votes</p>
 
-
-                        <button type="button" class="btn btn-secondary"><i class="bi bi-reply"></i> <a href="@Url.RouteUrl("CreateComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Reply</a></button>
-
-                            @if (ViewBag.AfisareButoane == true && c.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin || ViewBag.EsteModerator)
+                            @if (c.Deleted == false)
                             {
+                            <button type="button" class="btn btn-secondary"><i class="bi bi-reply"></i> <a href="@Url.RouteUrl("CreateComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Reply</a></button>
 
-                            <button type="button" class="btn btn-danger">
-                                <i class="bi bi-trash"></i>
-                                <a href="@Url.RouteUrl("DeleteComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Delete</a>
-                            </button>
-                            }
-                            @if (ViewBag.AfisareButoane == true && c.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin)
-                            {
-                            <button type="button" class="btn btn-primary">
-                                <i class="bi bi-pencil-fill"></i>
-                                <a href="@Url.RouteUrl("EditComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Edit</a>
-                            </button>
+                                @if (ViewBag.AfisareButoane == true && c.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin || ViewBag.EsteModerator)
+                                {
+
+                                <button type="button" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                    <a href="@Url.RouteUrl("DeleteComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Delete</a>
+                                </button>
+                                }
+                                @if (ViewBag.AfisareButoane == true && c.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin)
+                                {
+                                <button type="button" class="btn btn-primary">
+                                    <i class="bi bi-pencil-fill"></i>
+                                    <a href="@Url.RouteUrl("EditComment", new {subId = Model.SubId, postId = Model.Id, commentId = c.Id})" class="text-decoration-none link-light">Edit</a>
+                                </button>
+                                }
                             }
 
 

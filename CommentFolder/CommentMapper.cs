@@ -4,7 +4,7 @@ namespace RedditNet.CommentFolder
 {
     public class CommentMapper
     {
-        public CommentThreadModel toThreadModel(Comment c, String subId, int depth = 0, String userName = "user name here")
+        public CommentThreadModel toThreadModel(Comment c, String subId, bool deletedState, int depth = 0, String userName = "user name here")
         {
             CommentThreadModel result = new CommentThreadModel();
             result.Text = c.Text;
@@ -15,6 +15,7 @@ namespace RedditNet.CommentFolder
             result.SubId = subId;
             result.PostId = c.PostId;
             result.UserName = userName;
+            result.Deleted = deletedState;
 
             return result;
         }
