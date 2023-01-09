@@ -129,6 +129,7 @@ namespace RedditNet.Controllers
             {
                 try
                 {
+                    TempData["message"] = "The user has been deleted";
                     Console.WriteLine(u.UserName);
                     _context.Remove(u);
                     _context.SaveChanges();

@@ -14,28 +14,29 @@
     }
 </style>
 
-<div class="searchWrapper" style="background-color:#a0d2eb;font-size:20px">
-    <a class="searchLink text-decoration-none " href='/search/0/sr?search=@Context.Request.Query["search"]'>SubReddits</a>
-    <a class="searchLink text-decoration-none " href='/search/0/users?search=@Context.Request.Query["search"]'>Users</a>
-    <a class="searchLink text-decoration-none " href='/search/0/comments?search=@Context.Request.Query["search"]'>Comments</a>
-    <a class="searchLink text-decoration-none  " href='/search/0/posts?search=@Context.Request.Query["search"]'>Posts</a>
+<div class="searchWrapper" style="background-color:#003d7c;font-size:20px">
+    <a class="searchLink text-decoration-none link-light" href='/search/0/sr?search=@Context.Request.Query["search"]'>SubReddits</a>
+    <a class="searchLink text-decoration-none link-light" href='/search/0/users?search=@Context.Request.Query["search"]'>Users</a>
+    <a class="searchLink text-decoration-none link-light" href='/search/0/comments?search=@Context.Request.Query["search"]'>Comments</a>
+    <a class="searchLink text-decoration-none  link-light" href='/search/0/posts?search=@Context.Request.Query["search"]'>Posts</a>
 </div>
 <br />
+<button class="btn btn-outline-light" ><a href='@Url.ActionLink("Index", "Home")' class="link-secondary text-decoration-none" >Back to Home Page</a></button>
 @if (Model.Subs != null)
 {
 
-    <div class="subs-wrapper">
-        <h2>Explore SubReddits down below </h2>
+    <div class="subs-wrapper " >
 
-        <div class="container-fluid subs-list">
+        <h3 style="align-self:center;background-image:linear-gradient(to right,white,#e1f1f9,white)">SubReddits related to your search</h3>
+        <div class="container-fluid subs-list " >
             @{
                 foreach (var s in Model.Subs)
                 {
-                                <div class="subs-row">
-                                    <h5><a href="/subs/@s.Id/posts/0" class="text-decoration-none link-dark">@s.Name</a></h5>
+                                                    <div class="subs-row">
+                                                        <h5 class="bg bg-light bg-gradient"><a href="/subs/@s.Id/posts/0" class="text-decoration-none link-dark">@s.Name</a></h5>
 
-                                    <p class="card-body">@s.Description</p>
-                                </div>
+                                                        <p class="card-body">@s.Description</p>
+                                                    </div>
 
                 }
             }
@@ -46,6 +47,7 @@
     @if (ViewBag.Page > 0)
     {
         <form method="GET" action="@Url.RouteUrl("SearchResults", new {page = ViewBag.Page - 1, type = "sr"})">
+            
             <div class="input-group mb-3">
                 <input type="text" class="form-control"
                placeholder="Search topics or keywords" name="search"
@@ -62,6 +64,7 @@
     {
 
         <form method="GET" action="@Url.RouteUrl("SearchResults", new {page = ViewBag.Page + 1, type = "sr"})">
+            
             <div class="input-group mb-3">
                 <input type="text" class="form-control"
                placeholder="Search topics or keywords" name="search"
@@ -73,18 +76,24 @@
             </div>
         </form>
     }
-
+   
 }
 
 @if (Model.Comments != null)
 {
+    <h3 style="align-self:center;background-image:linear-gradient(to right,white,#e1f1f9,white)">See coments related to your search</h3>
     @foreach (var x in Model.Comments)
     {
-        <div>
-            <a class="text-decoration-none text-secondary" href="/@x.SubId/posts/@x.PostId/comments">See comment here -> </a>
-            @x.UserId
-            @x.Votes.ToString()
-            @x.Text
+
+        <div class="card" style="background-image:linear-gradient(to right, #f9fcfe,white,#f9fcfe)">
+            <br />
+            <h4 style="font-size:25px;align-self:center">
+                See comment <a class="text-decoration-none link-info" href="/@x.SubId/posts/@x.PostId/comments"> here -> </a>
+            @*@x.UserId
+            @x.Votes.ToString()*@
+            Content: @x.Text
+            </h4>
+            <br>
         </div>
     }
 
@@ -124,7 +133,7 @@
 @if (Model.Posts != null)
 {
     <div class="card">
-        <h2 class="card-header">Posts below</h2>
+        <h2 class="card-header" style="align-self:center;background-image:linear-gradient(to right,white,#e1f1f9,white)">Posts related to your search</h2>
         <div class="card-body">
             @foreach (var p in Model.Posts)
             {
@@ -179,11 +188,13 @@
 
 @if (Model.Users != null)
 {
+    <h3 style="align-self:center;background-image:linear-gradient(to right,white,#e1f1f9,white)">Users related to your search</h3>
+
     @foreach (var u in Model.Users)
     {
         <div class="card">
-            <div class="card-body">
-                <h2 class=""> <a class="text-decoration-none text-primary" href="/users/@u.Id">@u.UserName </a></h2>
+            <div class="card-body" style="align-self:center">
+                <h2 > <a class="text-decoration-none link-dark" href="/users/@u.Id">@u.UserName </a></h2>
             </div>
 
         </div>
@@ -219,7 +230,6 @@
             </div>
         </form>
     }
-
-
+   
 }
 
