@@ -22,11 +22,6 @@
             @Html.ValidationMessage("Text", null, new { @class = "text-danger" })
             <br />
             <br />
-            @Html.Label("Votes", "Upvotes/Downvotes")
-            <br />
-
-            @Html.TextBox("Votes", Model.Votes, new { @class = "form-control" })
-            <br />
             <button class="btn btn-primary" type="submit">Edit Comment</button>
         </form>
     </div>

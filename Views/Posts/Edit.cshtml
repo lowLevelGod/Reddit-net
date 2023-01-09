@@ -11,10 +11,6 @@
     <h1 class="card-header"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-dark">Back to @Model.Title</a></h1>
     <div class="card-body">
         <form method="post" action="/@Model.SubId/posts/edit/@Model.Id">
-            @Html.Label("Votes", "Upvotes/Downvotes")
-            <br />
-            @Html.TextBox("Votes", Model.Votes, new { @class = "form-control" })
-            <br />
             @Html.Label("Text", "Edit Content")
             <br />
            
