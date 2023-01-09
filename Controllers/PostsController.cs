@@ -113,7 +113,7 @@ namespace RedditNet.Controllers
         {
             
             ViewBag.AfisareButoane = false;
-            if (User.IsInRole("Moderator")||User.IsInRole("Regular"))
+            if (User.IsInRole("Moderator")||User.IsInRole("Regular")||User.IsInRole("Admin"))
             {
                 ViewBag.AfisareButoane = true;
             }

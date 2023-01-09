@@ -103,8 +103,8 @@ namespace RedditNet.Controllers
                     /*if (!roles.Contains<String>(newRole))
                         newRole = "Regular";*/
 
-                    _userManager.AddToRoleAsync(user, newRole);
-                    _userManager.UpdateSecurityStampAsync(user);
+                    await(_userManager.AddToRoleAsync(user, newRole));
+                    await(_userManager.UpdateSecurityStampAsync(user));
 
                     /*var roleName = await _roleManager.FindByIdAsync(newRole);
                     await _userManager.AddToRoleAsync(user, newRole);
