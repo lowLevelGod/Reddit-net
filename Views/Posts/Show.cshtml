@@ -29,7 +29,7 @@
                 <button type="button" class="btn btn-danger"><i class="bi bi-trash"></i><a href="@Url.RouteUrl("DeletePost", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-light">Delete</a></button>
             }
 
-            @if (ViewBag.AfisareButoane == true && Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin || ViewBag.EsteModerator)
+            @if (ViewBag.AfisareButoane == true && User.IsInRole("Admin"))
             {
                 <button type="button" class="btn btn-primary"><a href="@Url.RouteUrl("MovePost", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-light">Move post</a></button>
             }
