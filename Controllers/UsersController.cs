@@ -75,10 +75,11 @@ namespace RedditNet.Controllers
                 u,
                 _userManager.GetRolesAsync(u).Result.ElementAt(0)
                 );
+                SetAccessRights();
 
             return View("Show", result);
         }
-
+        
         return View("Error");
     }
 
@@ -161,21 +162,37 @@ namespace RedditNet.Controllers
         return Redirect("/Identity/Account/Manage");
     }
 
-    //[HttpPost("users")]
-    //public IActionResult Create([FromBody] UserCreateModel u)
-    //{
-    //    UserMapper mapper = new UserMapper();
-    //    User user = mapper.createModelToUser(u);
+        //[HttpPost("users")]
+        //public IActionResult Create([FromBody] UserCreateModel u)
+        //{
+        //    UserMapper mapper = new UserMapper();
+        //    User user = mapper.createModelToUser(u);
 
-    //    du.createUser(user);
-    //    return Ok();
-    //}
+        //    du.createUser(user);
+        //    return Ok();
+        //}
 
-    //[HttpDelete("users/{userId}")]
-    //public IActionResult Delete(String userId, [FromBody] UserDeleteModel u)
-    //{
-    //    du.deleteUser(userId, u);
-    //    return Ok();
-    //}
-}
+        //[HttpDelete("users/{userId}")]
+        //public IActionResult Delete(String userId, [FromBody] UserDeleteModel u)
+        //{
+        //    du.deleteUser(userId, u);
+        //    return Ok();
+        //}
+
+        //
+        private void SetAccessRights()
+        {
+
+            ViewBag.AfisareButoane = false;
+            if (User.IsInRole("Moderator") || User.IsInRole("Regular"))
+            {
+                ViewBag.AfisareButoane = true;
+            }
+            ViewBag.UserCurent = _userManager.GetUserId(User);
+            ViewBag.EsteAdmin = User.IsInRole("Admin");
+            ViewBag.EsteModerator = User.IsInRole("Moderator");
+
+        }
+        //
+    }
 }

@@ -27,19 +27,21 @@
                         <p>About: <b>Apparently, this user prefers to keep an air of mystery about them.</b></p>
             }
                     <p>Role: <b>@Model.Role</b></p>
-
-                    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
-                        <button class="btn btn-secondary" type="submit">Change to Regular</button>
-                    </form>
-                    <br>
-                    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Moderator"})">
-                        <button class="btn btn-secondary"type="submit">Change to Moderator</button>
-                    </form>
-                    <br>
-                    <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Admin"})">
-                        <button class="btn btn-secondary" type="submit">Change to Admin</button>
-                    </form>
-                </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
+                    <button class="btn btn-secondary" type="submit">Change to Regular</button>
+                </form>
+                <br>
+                <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Moderator"})">
+                    <button class="btn btn-secondary"type="submit">Change to Moderator</button>
+                </form>
+                <br>
+                <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Admin"})">
+                    <button class="btn btn-secondary" type="submit">Change to Admin</button>
+                </form>
+            }
+        </div>
                 
     </div>
 
