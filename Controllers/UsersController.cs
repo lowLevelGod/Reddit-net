@@ -64,25 +64,6 @@ namespace RedditNet.Controllers
             return Redirect("/Identity/Account/Manage");
     }
 
-    [HttpGet("users/{userId}", Name = "ShowUser")]
-    public IActionResult Show(String userId)
-    {
-        DatabaseUser? u = dbUsers.readUser(userId);
-        if (u != null)
-        {
-            UserMapper mapper = new UserMapper();
-            UserShowModel result = mapper.toShowModel(
-                u,
-                _userManager.GetRolesAsync(u).Result.ElementAt(0)
-                );
-                SetAccessRights();
-
-            return View("Show", result);
-        }
-        
-        return View("Error");
-    }
-
         [Authorize(Roles = "Admin")]
         [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
         public async Task<IActionResult> ChangeRole(String userId, String newRole)
@@ -103,8 +84,8 @@ namespace RedditNet.Controllers
                     /*if (!roles.Contains<String>(newRole))
                         newRole = "Regular";*/
 
-                    _userManager.AddToRoleAsync(user, newRole);
-                    _userManager.UpdateSecurityStampAsync(user);
+                    await _userManager.AddToRoleAsync(user, newRole);
+                    await _userManager.UpdateSecurityStampAsync(user);
 
                     /*var roleName = await _roleManager.FindByIdAsync(newRole);
                     await _userManager.AddToRoleAsync(user, newRole);
@@ -117,6 +98,51 @@ namespace RedditNet.Controllers
 
             return View("Error");
         }
+
+        [HttpGet("users/{userId}", Name = "ShowUser")]
+        public IActionResult Show(String userId)
+        {
+            DatabaseUser? u = dbUsers.readUser(userId);
+            if (u != null)
+            {
+                UserMapper mapper = new UserMapper();
+                UserShowModel result = mapper.toShowModel(
+                    u,
+                    _userManager.GetRolesAsync(u).Result.ElementAt(0)
+                    );
+                SetAccessRights();
+
+                return View("Show", result);
+            }
+
+            return View("Show", null);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("users/{userId}/delete", Name = "DeleteUser")]
+        public IActionResult Delete(String userId)
+        {
+            DatabaseUser? u = dbUsers.readUser(userId);
+            Console.WriteLine("Helooooo");
+            Console.WriteLine(u.UserName);
+            if (u != null)
+            {
+                try
+                {
+                    Console.WriteLine(u.UserName);
+                    _context.Remove(u);
+                    _context.SaveChanges();
+
+                    return Redirect("/");
+                }catch(Exception e)
+                {
+
+                }
+            }
+
+            return Redirect("/");
+        }
+
         //[Authorize(Roles = "Admin")]
         /*    [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
             public IActionResult ChangeRole(String userId, String newRole)

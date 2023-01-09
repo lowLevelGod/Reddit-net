@@ -4,7 +4,7 @@ namespace RedditNet
 {
     public class Submission
     {
-        private String userId;
+        private String? userId;
         private String text;
         private int votes;
 

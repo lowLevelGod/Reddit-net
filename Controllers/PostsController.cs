@@ -93,7 +93,7 @@ namespace RedditNet.Controllers
                 PostThreadModel result = pmapper.toThreadModel(
                     comments, 
                     databaseMapper.toPost(dbPost), sub == null ? "" : sub.Name,
-                    dbPost.User.UserName);
+                    dbPost.User?.UserName ?? "[deleted]");
 
                 ViewBag.ByTimeAsc = Constants.comparisonByTimeAsc;
                 ViewBag.ByTimeDesc = Constants.comparisonByTimeDesc;

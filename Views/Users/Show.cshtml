@@ -29,6 +29,9 @@
                     <p>Role: <b>@Model.Role</b></p>
             @if (User.IsInRole("Admin"))
             {
+                <form method="get" action="@Url.RouteUrl("DeleteUser", new {userId = Model.Id})">
+                    <button class="btn btn-danger" type="submit">Delete User </button>
+                </form>
                 <form method="post" action="@Url.RouteUrl("ChangeRoleUser", new {userId = Model.Id, newRole = "Regular"})">
                     <button class="btn btn-secondary" type="submit">Change to Regular</button>
                 </form>

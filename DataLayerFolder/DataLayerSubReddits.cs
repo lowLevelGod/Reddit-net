@@ -148,7 +148,7 @@ namespace RedditNet.DataLayerFolder
 
                 }
 
-                String userName = "user name here";
+                String userName = "[deleted]";
                 if (u != null)
                 {
                     userName = u.UserName;

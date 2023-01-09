@@ -58,7 +58,7 @@ namespace RedditNet.DataLayerFolder
                     foreach (DatabasePost p in posts)
                     {
                         PostMapper pm = new PostMapper();
-                        result.Add(pm.toPreviewModel(p.User.UserName,
+                        result.Add(pm.toPreviewModel(p.User?.UserName ?? "[deleted]",
                             mapper.toPost(p)));
                     }
 

@@ -25,9 +25,9 @@ namespace RedditNet.Models.DatabaseModel
         public CommentThreadModel toThreadComment(DatabaseComment c, String subId)
         {
             CommentMapper mapper = new CommentMapper();
-            Comment comment = new Comment(c.PostId, c.Id, c.User.Id, c.Text, c.Votes);
+            Comment comment = new Comment(c.PostId, c.Id, c.User?.Id ?? null, c.Text, c.Votes);
 
-            return mapper.toThreadModel(comment, subId, c.Deleted, c.Depth, c.User.UserName);
+            return mapper.toThreadModel(comment, subId, c.Deleted, c.Depth, c.User?.UserName ?? "[deleted]");
         }
 
         public DatabasePost toDBPost(Post p, DatabaseUser user)
@@ -45,7 +45,7 @@ namespace RedditNet.Models.DatabaseModel
 
         public Post toPost(DatabasePost p)
         {
-            Post res = new Post(p.Title, p.User.Id, p.Text, p.SubId, p.Id, p.Votes);
+            Post res = new Post(p.Title, p.User?.Id ?? null, p.Text, p.SubId, p.Id, p.Votes);
 
             return res;
         }
