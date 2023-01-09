@@ -8,21 +8,31 @@
 <h3>@ViewData["Title"]</h3>
 
 <div class="card">
+    
+        <h2 class="card-header">@Model.Username </h2>
     <div class="card-body">
-        <h2 class="">@Model.Username </h2>
         @if (Model.ProfilePic != null)
         {
-            <img src="@Url.Content(Model.ProfilePic)" alt="poza profil">
+            <img src="@Url.Content(Model.ProfilePic)" alt="poza profil" style="border-radius:100%;width:300px">
         }
         else
         {
-            <img src="/pictures/defaultPic.svg" alt="poza profil">
+            <img src="/pictures/defaultPic.svg" alt="poza profil" style="border-radius:100%;display:block;width:300px;margin-left: auto;margin-right: auto;">
         }
+
+        <br />
+        <p>Role: <b>@Model.Role</b></p>
+        <br />
+        <br />
         <form enctype="multipart/form-data" asp-controller="Users" asp-action="UploadProfilePic">
             <input class="form-control" type="file" name="profilePic" />
-            <br />
+            
             <input class="btn btn-success" type="submit" value="Upload" />
         </form>
+        <br />
+
+    </div>
+    <div >
         @if (Model.Description != null)
         {
             <form method="post" action="/users/edit">
@@ -64,15 +74,16 @@
                 </div>
             </form>
         }
-        <p>Role: <b>@Model.Role</b></p>
-
-
-
-
     </div>
 
-</div>
 
+
+
+
+
+</div>
+<br />
+<br />
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
     <div class="col-md-6">

@@ -2,25 +2,25 @@
 @model RedditNet.Models.SearchModel
 
 <style>
-    .searchWrapper{
+    .searchWrapper {
         display: flex;
         width: 100%;
         justify-content: center;
         align-items: center;
     }
 
-    .searchLink{
+    .searchLink {
         flex-grow: 1;
     }
 </style>
 
-<div class="searchWrapper">
-    <a class="searchLink" href='/search/0/sr?search=@Context.Request.Query["search"]'>SubReddits</a>
-    <a class="searchLink" href='/search/0/users?search=@Context.Request.Query["search"]'>Users</a>
-    <a class="searchLink" href='/search/0/comments?search=@Context.Request.Query["search"]'>Comments</a>
-    <a class="searchLink" href='/search/0/posts?search=@Context.Request.Query["search"]'>Posts</a>
+<div class="searchWrapper" style="background-color:#a0d2eb;font-size:20px">
+    <a class="searchLink text-decoration-none " href='/search/0/sr?search=@Context.Request.Query["search"]'>SubReddits</a>
+    <a class="searchLink text-decoration-none " href='/search/0/users?search=@Context.Request.Query["search"]'>Users</a>
+    <a class="searchLink text-decoration-none " href='/search/0/comments?search=@Context.Request.Query["search"]'>Comments</a>
+    <a class="searchLink text-decoration-none  " href='/search/0/posts?search=@Context.Request.Query["search"]'>Posts</a>
 </div>
-
+<br />
 @if (Model.Subs != null)
 {
 
@@ -31,11 +31,11 @@
             @{
                 foreach (var s in Model.Subs)
                 {
-                    <div class="subs-row">
-                        <h5><a href="/subs/@s.Id/posts/0" class="text-decoration-none link-dark">@s.Name</a></h5>
+                                <div class="subs-row">
+                                    <h5><a href="/subs/@s.Id/posts/0" class="text-decoration-none link-dark">@s.Name</a></h5>
 
-                        <p class="card-body">@s.Description</p>
-                    </div>
+                                    <p class="card-body">@s.Description</p>
+                                </div>
 
                 }
             }
@@ -81,7 +81,7 @@
     @foreach (var x in Model.Comments)
     {
         <div>
-            <a href="/@x.SubId/posts/@x.PostId/comments">see comment here</a>
+            <a class="text-decoration-none text-secondary" href="/@x.SubId/posts/@x.PostId/comments">See comment here -> </a>
             @x.UserId
             @x.Votes.ToString()
             @x.Text
@@ -106,7 +106,7 @@
     @if (ViewBag.Page < ViewBag.MaxPage)
     {
 
-          <form method="GET" action="@Url.RouteUrl("SearchResults", new {page = ViewBag.Page + 1, type = "comments"})">
+        <form method="GET" action="@Url.RouteUrl("SearchResults", new {page = ViewBag.Page + 1, type = "comments"})">
             <div class="input-group mb-3">
                 <input type="text" class="form-control"
                placeholder="Search topics or keywords" name="search"
@@ -183,7 +183,7 @@
     {
         <div class="card">
             <div class="card-body">
-                <h2 class=""> <a href="/users/@u.Id">@u.UserName </a></h2>
+                <h2 class=""> <a class="text-decoration-none text-primary" href="/users/@u.Id">@u.UserName </a></h2>
             </div>
 
         </div>

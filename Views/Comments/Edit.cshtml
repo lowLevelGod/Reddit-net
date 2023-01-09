@@ -10,7 +10,7 @@
 
 
 <div class="card">
-    <h1 class="card-header bg-gradient bg-primary"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.PostId})" class="text-decoration-none link-light">Back to comments</a></h1>
+    <h1 class="card-header "><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.PostId})" class="text-decoration-none link-primary">Back to comments</a></h1>
     <div class="card-body">
 
         <form method="post" action="/@Model.SubId/@Model.PostId/comments/edit/@Model.Id">

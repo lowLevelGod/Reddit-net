@@ -35,8 +35,7 @@ namespace RedditNet.Controllers
         }
         
         
-    ////TODO
-    ////MOVE POST TO OTHER SUBREDDIT
+    
 
     [HttpGet("subs/{subId}/posts/{start}", Name = "ShowSubPosts")]
         public IActionResult Show(String subId, int start)

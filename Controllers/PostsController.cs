@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -127,13 +128,14 @@ namespace RedditNet.Controllers
         [HttpPost("{subId}/posts/edit/{postId}")]
         public IActionResult Edit(String subId, String postId, PostUpdateModel p)
         {
-            
+            var sanitizer=new HtmlSanitizer();
             DatabasePost? dbPost = dbPosts.updatePost(subId, postId, p);
 
             if (dbPost != null && p.Text != null)
             {
                 if (_userManager.GetUserId(User)==dbPost.User.Id || User.IsInRole("Admin"))
                 {
+                    dbPost.Text = sanitizer.Sanitize(p.Text);
                     TempData["message"] = "Your post has been modified";
 
                     return RedirectToAction("Show", new { subId = dbPost.SubId, postId = dbPost.Id });
@@ -228,6 +230,7 @@ namespace RedditNet.Controllers
         [HttpPost("{subId}/posts/create")]
         public IActionResult Create(PostCreateModel p)
         {
+            var sanitizer = new HtmlSanitizer();
             PostMapper mapper = new PostMapper();
             Post post = mapper.createModelToPost(p);
 
@@ -236,6 +239,7 @@ namespace RedditNet.Controllers
             DatabasePost? dbPost = dbPosts.createPost(post, user);
             if (dbPost != null)
             {
+                dbPost.Text = sanitizer.Sanitize(dbPost.Text);
                 //mesaj validare care va fi afisat in show
                 TempData["message"] = "Your post has been added";
                 //
@@ -253,11 +257,14 @@ namespace RedditNet.Controllers
         [HttpGet("{subId}/posts/create")]
         public IActionResult CreateForm(String subId)
         {
+            var sanitizer = new HtmlSanitizer();
             PostCreateModel cm = new PostCreateModel();
             cm.Title = "";
             cm.Text = "";
             cm.UserId = _userManager.GetUserId(User);
             cm.SubId = subId;
+
+            
 
             return View("Create", cm);
         }

@@ -23,7 +23,7 @@
             <br />
             @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger" })
             <br />
-            @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
+            @Html.TextArea("Text", null, new { @class = "summernote" })
             
             <br />
             <button type="submit" class="btn btn-primary">Create Post</button>

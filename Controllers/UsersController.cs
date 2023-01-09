@@ -9,6 +9,7 @@ using RedditNet.UserFolder;
 
 namespace RedditNet.Controllers
 {
+    [Authorize(Roles = "Regular,Moderator,Admin")]
     public class UsersController : Controller
     {
 
@@ -81,36 +82,70 @@ namespace RedditNet.Controllers
         return View("Error");
     }
 
-    //[Authorize(Roles = "Admin")]
-    [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
-    public IActionResult ChangeRole(String userId, String newRole)
-    {
-        //if (User.IsInRole("Admin"))
-        //{
-        DatabaseUser? user = dbUsers.readUser(userId);
-        String[] roles = new string[] { "Admin", "Regular", "Moderator" };
-        if (user != null)
+        [Authorize(Roles = "Admin")]
+        [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
+        public async Task<IActionResult> ChangeRole(String userId, String newRole)
         {
-            List<String> currentRoles = (List<string>)_userManager.GetRolesAsync(user).Result;
-            _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (User.IsInRole("Admin"))
+            {
+                DatabaseUser? user = dbUsers.readUser(userId);
+                String[] roles = new string[] { "Admin", "Regular", "Moderator" };
+                if (user != null)
+                {
 
-            if (!roles.Contains<String>(newRole))
-                newRole = "Regular";
+                    List<String> currentRoles = (List<string>)_userManager.GetRolesAsync(user).Result;
+                    /*_userManager.RemoveFromRolesAsync(user, currentRoles);*/
+                    foreach (var role in currentRoles)
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, role);
+                    }
+                    /*if (!roles.Contains<String>(newRole))
+                        newRole = "Regular";*/
 
-            _userManager.AddToRoleAsync(user, newRole);
-            _userManager.UpdateSecurityStampAsync(user);
+                    _userManager.AddToRoleAsync(user, newRole);
+                    _userManager.UpdateSecurityStampAsync(user);
 
+                    /*var roleName = await _roleManager.FindByIdAsync(newRole);
+                    await _userManager.AddToRoleAsync(user, newRole);
+*/
 
+                }
 
+                return RedirectToRoute("ShowUser", new { userId = userId });
+            }
+
+            return View("Error");
         }
+        //[Authorize(Roles = "Admin")]
+        /*    [HttpPost("users/{userId}/changeRole/{newRole}", Name = "ChangeRoleUser")]
+            public IActionResult ChangeRole(String userId, String newRole)
+            {
+                //if (User.IsInRole("Admin"))
+                //{
+                DatabaseUser? user = dbUsers.readUser(userId);
+                String[] roles = new string[] { "Admin", "Regular", "Moderator" };
+                if (user != null)
+                {
+                    List<String> currentRoles = (List<string>)_userManager.GetRolesAsync(user).Result;
+                    _userManager.RemoveFromRolesAsync(user, currentRoles);
 
-        return RedirectToRoute("ShowUser", new { userId = userId });
-        //}
+                    if (!roles.Contains<String>(newRole))
+                        newRole = "Regular";
 
-        return View("Error");
-    }
+                    _userManager.AddToRoleAsync(user, newRole);
+                    _userManager.UpdateSecurityStampAsync(user);
 
-    [HttpPost("users/edit")]
+
+
+                }
+
+                return RedirectToRoute("ShowUser", new { userId = userId });
+                //}
+
+                return View("Error");
+            }*/
+
+        [HttpPost("users/edit")]
     public IActionResult Edit(UserUpdateModel m)
     {
         DatabaseUser? u = _userManager.FindByEmailAsync(User.Identity.Name).Result;

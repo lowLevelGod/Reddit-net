@@ -12,12 +12,12 @@
 
 @{
     <div class="card">
-        <h1 class="card-header bg-primary text-light">@Model.Title</h1>
+        <h1 class="card-header ">@Model.Title</h1>
         <div class="card-body">
             <h2><a href="@Url.RouteUrl("ShowSubPosts", new {subId = Model.SubId, start = 0})" class="text-decoration-none">Go back to SubReddit @Model.SubName</a></h2>
             <p>Votes: <b>@Model.Votes</b></p>
             <p><b>Posted by </b><i class="bi bi-person"></i><a href="@Url.RouteUrl("ShowUser", new {userId = Model.UserId})" class="text-decoration-none link-secondary">@Model.UserName</a></p>
-            <p>Content: @Model.Text</p>
+            <p>Content: @Html.Raw(Model.Text)</p>
 
 
             @if (ViewBag.AfisareButoane == true && Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdmin)
@@ -41,7 +41,7 @@
 
     <br />
 
-    <div class="container mt-5">
+    <div >
 
         <div class="row  d-flex justify-content-center">
 
@@ -54,10 +54,10 @@
                 <i class="bi bi-sort-up"></i><a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByVotesDesc" class="text-decoration-none link-secondary"> Top </a>
                 <i class="bi bi-bar-chart"></i><a href="/@Model.SubId/posts/@Model.Id/comments/@ViewBag.ByVotesAsc" class="text-decoration-none link-secondary"> Controversial </a>
             </div>
-
+          
         </div>
     </div>
-
+    <br>
 
 
 
@@ -73,7 +73,7 @@
                     <li class="list-group-item">
                         <strong>
                             <i class="bi bi-person">
-                                <a href="@Url.RouteUrl("ShowUser", new {userId = c.UserId})">@c.UserName</a>
+                                <a href="@Url.RouteUrl("ShowUser", new {userId = c.UserId})" class="text-decoration-none text-secondary">@c.UserName</a>
                             </i>
                         </strong>
                             @if (c.Deleted == false)

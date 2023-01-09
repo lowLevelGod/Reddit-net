@@ -50,7 +50,7 @@
                     <div class="card-body">
                         <p class="card-text">
                             Posted by: <i class="bi bi-person"></i>
-                            <a href="@Url.RouteUrl("ShowUser", new {userId = p.UserId})">@p.UserName</a>
+                            <a href="@Url.RouteUrl("ShowUser", new {userId = p.UserId})" class="text-decoration-none">@p.UserName</a>
                         </p>
                         <p class="card-text">Votes: @p.Votes</p>
                     </div>

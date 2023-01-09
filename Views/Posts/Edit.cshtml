@@ -8,7 +8,7 @@
 }
 
 <div class="card">
-    <h1 class="card-header bg-primary"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-light">@Model.Title</a></h1>
+    <h1 class="card-header"><a href="@Url.RouteUrl("ShowPostComments", new {subId = Model.SubId, postId = Model.Id})" class="text-decoration-none link-dark">Back to @Model.Title</a></h1>
     <div class="card-body">
         <form method="post" action="/@Model.SubId/posts/edit/@Model.Id">
             @Html.Label("Votes", "Upvotes/Downvotes")
@@ -18,7 +18,7 @@
             @Html.Label("Text", "Edit Content")
             <br />
            
-            @Html.TextBox("Text", Model.Text, new { @class = "form-control" })
+            @Html.TextArea("Text", Model.Text, new { @class = "form-control summernote" })
             
             @Html.ValidationMessage("Text", null, new { @class ="text-danger" })
             <br />
